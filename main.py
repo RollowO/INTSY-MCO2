@@ -2,30 +2,20 @@ import re
 from pyswip import Prolog
 
 prolog = Prolog()
+prolog.consult("Relations.pl")
 
 def handle_father(match):
     father, child = match.groups()
     try:
         female = list(prolog.query(f"female({father})"))
-        # Check if child already has a father
-        has_father = list(prolog.query(f"father(X, {child})"))
-        # Prevent father from being the grandmother of the child
-        is_grandmother = list(prolog.query(f"grandmother({father}, {child})"))
     except Exception:
         female = False
-        has_father = False
-        is_grandmother = False
     if female:
         print(f"That's impossible!")
         return
-    if has_father and len(has_father) >= 1:
-        print(f"That's impossible! {child} already has a father.")
-        return
-    if is_grandmother:
-        print(f"That's impossible! A grandmother can't also be the father of her grandchild.")
-        return
+   
     prolog.assertz(f"father({father}, {child})")
-    prolog.assertz(f"male({father})") #When one becomes a father, male is asserted
+    prolog.assertz(f"male({father})")
     print(f"Added: father({father}, {child}) and male({father})")
 
 def handle_siblings(match):
@@ -44,41 +34,46 @@ def handle_sister(match):
         print(f"That's impossible!")
         return
     prolog.assertz(f"sister({sister}, {sibling})")
-    prolog.assertz(f"female({sister})") #When one becomes a sister, female is asserted
-    print(f"Added: sister({sister}, {sibling})")
+    prolog.assertz(f"female({sister})")
+    print(f"Added: sister({sister}, {sibling}) and female({sister})")
 
 def handle_mother(match):
     mother, child = match.groups()
     try:
-        Male = list(prolog.query(f"male({mother})")) #mother cannot be a male
-        # Check if child already has a mother
+        # Check if already declared male
+        is_male = list(prolog.query(f"male({mother})"))
+    except Exception:
+        is_male = False
+
+    if is_male:
+        print(f"That's impossible! {mother} is male and cannot be a mother.")
+        return
+
+    try:
         has_mother = list(prolog.query(f"mother(X, {child})"))
-        # Prevent mother from being the grandmother of the child
         is_grandmother = list(prolog.query(f"grandmother({mother}, {child})"))
     except Exception:
-        Male = False
         has_mother = False
         is_grandmother = False
-    if Male:
-        print(f"That's impossible!")
-        return
+
     if has_mother:
         print(f"That's impossible! {child} already has a mother.")
         return
     if is_grandmother:
         print(f"That's impossible! A grandmother can't also be the mother of her grandchild.")
         return
+
     prolog.assertz(f"mother({mother}, {child})")
-    prolog.assertz(f"female({mother})") #When one becomes a mother, female is asserted
+    prolog.assertz(f"female({mother})")
     print(f"Added: mother({mother}, {child}) and female({mother})")
+
 
 def handle_grandmother(match):
     grandmother, grandchild = match.groups()
     try:
         Male = list(prolog.query(f"male({grandmother})"))
-        # Prevent circular relationship: grandmother cannot be child of grandchild's father
-        circular = list(prolog.query(f"father(X, {grandchild})")) and \
-                   list(prolog.query(f"child({grandmother}, X)"))
+        # Prevent circular relationship: grandchild cannot be the grandmother of a grandmother
+        circular = list(prolog.query(f"grandparent({grandchild}, {grandmother})"))
         # Prevent grandmother from being the mother or father of the grandchild
         is_mother = list(prolog.query(f"mother({grandmother}, {grandchild})"))
         is_father = list(prolog.query(f"father({grandmother}, {grandchild})"))
@@ -111,8 +106,7 @@ def handle_child(match):
     child, parent = match.groups()
     try:
         circular = list(prolog.query(f"child({parent}, {child})")) or \
-                   list(prolog.query(f"father({child}, {parent})")) or \
-                   list(prolog.query(f"mother({child}, {parent})")) #father and mother are also considered parents, cannot be child of child
+                   list(prolog.query(f"parent({child}, {parent})")) #parents cannot be children of their own child
     except Exception:
         circular = False
     if circular:
@@ -121,6 +115,128 @@ def handle_child(match):
     prolog.assertz(f"child({child}, {parent})")
     print(f"Added: child({child}, {parent})")
 
+def handle_daughter(match):
+    daughter, parent = match.groups()   
+    try:
+        circular = list(prolog.query(f"child({parent}, {daughter})")) or \
+                   list(prolog.query(f"parent({daughter}, {parent})")) 
+    except Exception:
+        circular = False
+    if circular:
+        print(f"That's impossible!")
+        return
+    prolog.assertz(f"daughter({daughter}, {parent})")
+    print(f"Added: daughter({daughter}, {parent})")
+
+def handle_uncle(match):
+    uncle, nephew = match.groups()
+    try:
+        Male = list(prolog.query(f"male({uncle})"))
+        # Prevent circular relationship: uncle cannot be nephew of uncle
+        circular = list(prolog.query(f"uncle({nephew}, {uncle})"))
+        # Prevent child's mother or father from being the uncle
+        parent_is_uncle = list(prolog.query(f"parent({uncle}, {nephew})"))
+    except Exception:
+        Male = False
+        circular = False
+        parent_is_uncle = False
+    if Male:
+        print(f"That's impossible!")
+        return
+    if circular:
+        print(f"That's impossible! A child can't be the uncle of a father.")
+        return
+    if parent_is_uncle:
+        print(f"That's impossible! A child's mother or father can't also be their uncle.")
+        return
+    prolog.assertz(f"uncle({uncle}, {nephew})")
+    print(f"Added: uncle({uncle}, {nephew})")
+
+def handle_brother(match):
+    brother, sibling = match.groups()
+    try:
+        circular = list(prolog.query(f"child({brother}, {sibling})")) and \
+                   list(prolog.query(f"child({sibling}, {brother})"))
+    except Exception:
+        circular = False
+    if circular:
+        print(f"That's impossible! A brother can't be a sibling of himself.")
+        return
+    prolog.assertz(f"brother({brother}, {sibling})")
+    prolog.assertz(f"male({brother})")
+    print(f"Added: brother({brother}, {sibling}) and male({brother})")
+
+def handle_parents(match):
+    parent1, parent2, child = match.groups()
+    try:
+        circular = list(prolog.query(f"parent({child}, {parent1})")) or \
+                   list(prolog.query(f"parent({child}, {parent2})"))
+    except Exception:
+        circular = False
+    if circular:
+        print(f"That's impossible! A parent can't be a child of their own child.")
+        return
+    prolog.assertz(f"parent({parent1}, {child})")
+    prolog.assertz(f"parent({parent2}, {child})")
+    print(f"Added: parent({parent1}, {child}) and parent({parent2}, {child})")
+
+def handle_grandfather(match):
+    grandfather, grandchild = match.groups()
+    try:
+        circular = list(prolog.query(f"grandfather({grandchild}, {grandfather})")) and \
+                   list(prolog.query(f"female({grandfather})")) # grandfather cannot be female
+    except Exception:
+        circular = False
+    if circular:
+        print(f"That's impossible! A grandfather can't be a grandchild of himself.")
+        return
+    prolog.assertz(f"grandfather({grandfather}, {grandchild})")
+    prolog.assertz(f"male({grandfather})")
+    print(f"Added: grandfather({grandfather}, {grandchild}) and male({grandfather})")
+
+
+def handle_children(match):
+    children = match.groups()
+    parent = children[-1]
+    for child in children[:-1]:
+        try:
+            circular = list(prolog.query(f"child({parent}, {child})")) or \
+                        list(prolog.query(f"father({child}, {parent})"))
+        except Exception:
+            circular = False
+        if circular:
+            print(f"That's impossible! A parent can't be a child of their own child.")
+            return
+        prolog.assertz(f"child({child}, {parent})")
+
+def handle_son(match):
+    son, parent = match.groups()
+    try:
+        circular = list(prolog.query(f"child({parent}, {son})")) or \
+                   list(prolog.query(f"father({son}, {parent})")) or \
+                   list(prolog.query(f"mother({son}, {parent})")) #father and mother are also considered parents, cannot be child of child
+    except Exception:
+        circular = False
+    if circular:
+        print(f"That's impossible! A parent can't be a child of their own child.")
+        return
+    prolog.assertz(f"son({son}, {parent})")
+    prolog.assertz(f"male({son})")
+    print(f"Added: son({son}, {parent}) and male({son})")
+
+def handle_aunt(match):
+    aunt, niece = match.groups()
+    try:
+        circular = list(prolog.query(f"aunt({aunt}, {aunt})"))
+    except Exception:
+        circular = False
+    if circular:
+        print(f"That's impossible! An aunt can't be a niece of herself.")
+        return
+    prolog.assertz(f"aunt({aunt}, {niece})")
+    print(f"Added: aunt({aunt}, {niece})")
+
+
 patterns = [
     (r"(\w+)\s+is the father of\s+(\w+)", handle_father),
     (r"(\w+)\s+and\s+(\w+)\s+are siblings", handle_siblings),
@@ -128,16 +244,41 @@ patterns = [
     (r"(\w+)\s+is the mother of\s+(\w+)", handle_mother),
     (r"(\w+)\s+is the grandmother of\s+(\w+)", handle_grandmother),
     (r"(\w+)\s+is the child of\s+(\w+)", handle_child),
+    (r"(\w+)\s+is the daughter of\s+(\w+)\s+", handle_daughter),
+    (r"(\w+)\s+is the uncle of\s+(\w+)\s+", handle_uncle),
+    (r"(\w+)\s+is the brother of\s+(\w+)\s+", handle_brother),
+    (r"(\w+)\s+and\s+(\w+)\s+is the parents of (\w+)\s+", handle_parents),
+    (r"(\w+)\s+is the grandfather of\s+(\w+)\s+", handle_grandfather),
+    (r"(\w+)\s+and\s+(\w+)\s+and\s+(\w+)\s+are the children of\s+(\w+)", handle_children),
+    (r"(\w+)\s+is the son of\s+(\w+)", handle_son),
+    (r"(\w+)\s+is the aunt of\s+(\w+)", handle_aunt),
 ]
 
 query_patterns = [
     (r"are (\w+) and (\w+) siblings\?", lambda m: f"sibling({m.group(1)}, {m.group(2)})"),
     (r"is (\w+) a sister of (\w+)\?", lambda m: f"sister({m.group(1)}, {m.group(2)})"),
-    (r"Are (\w+)\s+and (\w+)\s+the parents of\s+(\w+)", lambda m: f"father({m.group(1)}, {m.group(3)})"),
+    (r"Is (\w+)\s+a brother of\s+(\w+)\?", lambda m: f"brother({m.group(1)}, {m.group(2)})"),
     (r"Is (\w+)\s+the mother of\s+(\w+)\?", lambda m: f"mother({m.group(1)}, {m.group(2)})"),
     (r"Is (\w+)\s+the father of\s+(\w+)\?", lambda m: f"father({m.group(1)}, {m.group(2)})"),
+    (r"Are (\w+)\s+and\s+(\w+)\s+the parents of\?", lambda m: f"parents({m.group(1)}, {m.group(2)})"),
     (r"Is (\w+)\s+the grandmother of\s+(\w+)\?", lambda m: f"grandmother({m.group(1)}, {m.group(2)})"),
+    (r"Is (\w+)\s+the daughter of\s+(\w+)\?", lambda m: f"daughter({m.group(1)}, {m.group(2)})"),
+    (r"Is (\w+)\s+the son of\s+(\w+)\?", lambda m: f"uncle({m.group(1)}, {m.group(2)})"),
     (r"Is (\w+)\s+the child of\s+(\w+)\?", lambda m: f"child({m.group(1)}, {m.group(2)})"),
+    (r"Are (\w+)\s+,\s+(\w+)\s+and\s+(\w+)\s+the children of\s+(\w+)\?", lambda m: f"children({m.group(1)}, {m.group(2)}, {m.group(3)}, {m.group(4)})"),
+    (r"Is (\w+)\s+the uncle of\s+(\w+)\?", lambda m: f"uncle({m.group(1)}, {m.group(2)})"),
+    (r"Who are the siblings of (\w+)\?", lambda m: f"siblings({m.group(1)})"),
+    (r"Who are the sisters of (\w+)\?", lambda m: f"sisters({m.group(1)})"),
+    (r"Who are the brothers of (\w+)\?", lambda m: f"brothers({m.group(1)})"),
+    (r"Who is the mother of (\w+)\?", lambda m: f"mother({m.group(1)})"),
+    (r"Who is the father of (\w+)\?", lambda m: f"father({m.group(1)})"),
+    (r"Who are the parents of (\w+)\?", lambda m: f"parents({m.group(1)})"),
+    (r"Is (\w+)\s+the grandfather of\s+(\w+)\?", lambda m: f"grandfather({m.group(1)}, {m.group(2)})"),
+    (r"Who are the daughters of (\w+)\?", lambda m: f"daughters({m.group(1)})"),
+    (r"Who are the sons of (\w+)\?", lambda m: f"sons({m.group(1)})"),
+    (r"Who are the children of (\w+)\?", lambda m: f"children({m.group(1)})"),
+    (r"Is (\w+)\s+the aunt of\s+(\w+)\?", lambda m: f"aunt({m.group(1)}, {m.group(2)})"),
+    (r"Are (\w+)\s+and\s+(\w+)\s+relatives\?", lambda m: f"relatives({m.group(1)}, {m.group(2)})"),
 ]
 
 def main():
