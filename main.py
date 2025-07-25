@@ -238,59 +238,75 @@ def handle_aunt(match):
 
 
 patterns = [
-    (r"(\w+)\s+is the father of\s+(\w+)", handle_father),
-    (r"(\w+)\s+and\s+(\w+)\s+are siblings", handle_siblings),
-    (r"(\w+)\s+is the sister of\s+(\w+)", handle_sister),
-    (r"(\w+)\s+is the mother of\s+(\w+)", handle_mother),
-    (r"(\w+)\s+is the grandmother of\s+(\w+)", handle_grandmother),
-    (r"(\w+)\s+is the child of\s+(\w+)", handle_child),
-    (r"(\w+)\s+is the daughter of\s+(\w+)\s+", handle_daughter),
-    (r"(\w+)\s+is the uncle of\s+(\w+)\s+", handle_uncle),
-    (r"(\w+)\s+is the brother of\s+(\w+)\s+", handle_brother),
-    (r"(\w+)\s+and\s+(\w+)\s+is the parents of (\w+)\s+", handle_parents),
-    (r"(\w+)\s+is the grandfather of\s+(\w+)\s+", handle_grandfather),
-    (r"(\w+)\s+and\s+(\w+)\s+and\s+(\w+)\s+are the children of\s+(\w+)", handle_children),
-    (r"(\w+)\s+is the son of\s+(\w+)", handle_son),
-    (r"(\w+)\s+is the aunt of\s+(\w+)", handle_aunt),
+    (r"(\w+)\s+is the father of\s+(\w+)\.?", handle_father),
+    (r"(\w+)\s+and\s+(\w+)\s+are siblings\.?", handle_siblings),
+    (r"(\w+)\s+is the sister of\s+(\w+)\.?", handle_sister),
+    (r"(\w+)\s+is the mother of\s+(\w+)\.?", handle_mother),
+    (r"(\w+)\s+is the grandmother of\s+(\w+)\.?", handle_grandmother),
+    (r"(\w+)\s+is the child of\s+(\w+)\.?", handle_child),
+    (r"(\w+)\s+is the daughter of\s+(\w+)\.?", handle_daughter),
+    (r"(\w+)\s+is the uncle of\s+(\w+)\.?", handle_uncle),
+    (r"(\w+)\s+is the brother of\s+(\w+)\.?", handle_brother),
+    (r"(\w+)\s+and\s+(\w+)\s+are the parents of\s+(\w+)\.?", handle_parents),
+    (r"(\w+)\s+is the grandfather of\s+(\w+)\.?", handle_grandfather),
+    (r"(\w+)\s+and\s+(\w+)\s+and\s+(\w+)\s+are the children of\s+(\w+)\.?", handle_children),
+    (r"(\w+)\s+is the son of\s+(\w+)\.?", handle_son),
+    (r"(\w+)\s+is the aunt of\s+(\w+)\.?", handle_aunt),
 ]
 
 query_patterns = [
-    (r"are (\w+) and (\w+) siblings\?", lambda m: f"sibling({m.group(1)}, {m.group(2)})"),
-    (r"is (\w+) a sister of (\w+)\?", lambda m: f"sister({m.group(1)}, {m.group(2)})"),
-    (r"Is (\w+)\s+a brother of\s+(\w+)\?", lambda m: f"brother({m.group(1)}, {m.group(2)})"),
-    (r"Is (\w+)\s+the mother of\s+(\w+)\?", lambda m: f"mother({m.group(1)}, {m.group(2)})"),
-    (r"Is (\w+)\s+the father of\s+(\w+)\?", lambda m: f"father({m.group(1)}, {m.group(2)})"),
-    (r"Are (\w+)\s+and\s+(\w+)\s+the parents of\?", lambda m: f"parents({m.group(1)}, {m.group(2)})"),
-    (r"Is (\w+)\s+the grandmother of\s+(\w+)\?", lambda m: f"grandmother({m.group(1)}, {m.group(2)})"),
-    (r"Is (\w+)\s+the daughter of\s+(\w+)\?", lambda m: f"daughter({m.group(1)}, {m.group(2)})"),
-    (r"Is (\w+)\s+the son of\s+(\w+)\?", lambda m: f"uncle({m.group(1)}, {m.group(2)})"),
-    (r"Is (\w+)\s+the child of\s+(\w+)\?", lambda m: f"child({m.group(1)}, {m.group(2)})"),
-    (r"Are (\w+)\s+,\s+(\w+)\s+and\s+(\w+)\s+the children of\s+(\w+)\?", lambda m: f"children({m.group(1)}, {m.group(2)}, {m.group(3)}, {m.group(4)})"),
-    (r"Is (\w+)\s+the uncle of\s+(\w+)\?", lambda m: f"uncle({m.group(1)}, {m.group(2)})"),
-    (r"Who are the siblings of (\w+)\?", lambda m: f"siblings({m.group(1)})"),
-    (r"Who are the sisters of (\w+)\?", lambda m: f"sisters({m.group(1)})"),
-    (r"Who are the brothers of (\w+)\?", lambda m: f"brothers({m.group(1)})"),
-    (r"Who is the mother of (\w+)\?", lambda m: f"mother({m.group(1)})"),
-    (r"Who is the father of (\w+)\?", lambda m: f"father({m.group(1)})"),
-    (r"Who are the parents of (\w+)\?", lambda m: f"parents({m.group(1)})"),
-    (r"Is (\w+)\s+the grandfather of\s+(\w+)\?", lambda m: f"grandfather({m.group(1)}, {m.group(2)})"),
-    (r"Who are the daughters of (\w+)\?", lambda m: f"daughters({m.group(1)})"),
-    (r"Who are the sons of (\w+)\?", lambda m: f"sons({m.group(1)})"),
-    (r"Who are the children of (\w+)\?", lambda m: f"children({m.group(1)})"),
-    (r"Is (\w+)\s+the aunt of\s+(\w+)\?", lambda m: f"aunt({m.group(1)}, {m.group(2)})"),
-    (r"Are (\w+)\s+and\s+(\w+)\s+relatives\?", lambda m: f"relatives({m.group(1)}, {m.group(2)})"),
+    (r"Are (\w+) and (\w+) siblings\?", lambda m: f"sibling({m.group(1)}, {m.group(2)})"),
+    (r"Who are the siblings of (\w+)\?", lambda m: f"sibling(X, {m.group(1)})"),
+    
+    (r"Is (\w+) a sister of (\w+)\?", lambda m: f"sister({m.group(1)}, {m.group(2)})"),
+    (r"Who are the sisters of (\w+)\?", lambda m: f"sister(X, {m.group(1)})"),
+    
+    (r"Is (\w+) a brother of (\w+)\?", lambda m: f"brother({m.group(1)}, {m.group(2)})"),
+    (r"Who are the brothers of (\w+)\?", lambda m: f"brother(X, {m.group(1)})"),
+
+    (r"Is (\w+) the mother of (\w+)\?", lambda m: f"mother({m.group(1)}, {m.group(2)})"),
+    (r"Who is the mother of (\w+)\?", lambda m: f"mother(X, {m.group(1)})"),
+
+    (r"Is (\w+) the father of (\w+)\?", lambda m: f"father({m.group(1)}, {m.group(2)})"),
+    (r"Who is the father of (\w+)\?", lambda m: f"father(X, {m.group(1)})"),
+
+    (r"Are (\w+) and (\w+) the parents of (\w+)\?", lambda m: f"parent({m.group(1)}, {m.group(3)}) , parent({m.group(2)}, {m.group(3)})"),
+    (r"Who are the parents of (\w+)\?", lambda m: f"parent(X, {m.group(1)})"),
+
+    (r"Is (\w+) a grandmother of (\w+)\?", lambda m: f"grandmother({m.group(1)}, {m.group(2)})"),
+    (r"Is (\w+) a grandfather of (\w+)\?", lambda m: f"grandfather({m.group(1)}, {m.group(2)})"),
+
+    (r"Is (\w+) a daughter of (\w+)\?", lambda m: f"daughter({m.group(1)}, {m.group(2)})"),
+    (r"Who are the daughters of (\w+)\?", lambda m: f"daughter(X, {m.group(1)})"),
+
+    (r"Is (\w+) a son of (\w+)\?", lambda m: f"son({m.group(1)}, {m.group(2)})"),
+    (r"Who are the sons of (\w+)\?", lambda m: f"son(X, {m.group(1)})"),
+
+    (r"Is (\w+) a child of (\w+)\?", lambda m: f"child({m.group(1)}, {m.group(2)})"),
+    (r"Who are the children of (\w+)\?", lambda m: f"child(X, {m.group(1)})"),
+
+    (r"Are (\w+), (\w+), and (\w+) children of (\w+)\?", lambda m: f"child({m.group(1)}, {m.group(4)}) , child({m.group(2)}, {m.group(4)}) , child({m.group(3)}, {m.group(4)})"),
+
+    (r"Is (\w+) an uncle of (\w+)\?", lambda m: f"uncle({m.group(1)}, {m.group(2)})"),
+    (r"Is (\w+) an aunt of (\w+)\?", lambda m: f"aunt({m.group(1)}, {m.group(2)})"),
+
+    (r"Are (\w+) and (\w+) relatives\?", lambda m: f"relatives({m.group(1)}, {m.group(2)})"),
 ]
+
 
 def main():
     print("Enter relationships or queries (type 'exit' to stop):")
     while True:
-        statement = input(">> ").strip().lower()
-        if statement == "exit":
+        statement = input(">> ").strip()
+        if statement.lower() == "exit":
             break
 
-        # Check for sentence-based queries first
+        # Normalize trailing punctuation (like '.') and lowercase only for matching, not values
+        normalized = statement.rstrip(".? ").strip()
+
+        # Check for sentence-based queries
         for pattern, query_builder in query_patterns:
-            match = re.match(pattern, statement)
+            match = re.match(pattern, statement, re.IGNORECASE)
             if match:
                 query = query_builder(match)
                 try:
@@ -303,9 +319,9 @@ def main():
                     print(f"Invalid query: {e}")
                 break
         else:
-            # Fallback to direct Prolog queries with '?'
+            # Direct Prolog query fallback
             if "?" in statement:
-                query = statement.replace("?", "").strip()
+                query = normalized
                 try:
                     results = list(prolog.query(query))
                     if results:
@@ -317,14 +333,15 @@ def main():
                     print(f"Invalid query: {e}")
                 continue
 
-            # Relationship statements
+            # Relationship sentence matching
             for pattern, handler in patterns:
-                match = re.match(pattern, statement)
+                match = re.match(pattern, normalized, re.IGNORECASE)
                 if match:
                     handler(match)
                     break
             else:
                 print("Please follow a sentence pattern.")
+
 
 if __name__ == "__main__":
     main()
