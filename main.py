@@ -224,7 +224,7 @@ def handle_son(match):
     prolog.assertz(f"male({son})")
     print(f"Added: son({son}, {parent}) and male({son})")
 
-def handle_aunt(match):
+def handle_aunt(match): ####################BUGS FOR RELATIONS IN RELATIONS.PL, NEED TO CHANGE ASSERTZ TO FOLLOW RULES###############################
     aunt, niece = match.groups()
     try:
         circular = list(prolog.query(f"aunt({aunt}, {aunt})"))
