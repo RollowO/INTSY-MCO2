@@ -4,167 +4,322 @@ from pyswip import Prolog
 prolog = Prolog()
 prolog.consult("Relations.pl")
 
+def check_gender_conflict(name, expected_gender):
+    opposite = "male" if expected_gender == "female" else "female"
+    return list(prolog.query(f"{opposite}('{name}')"))
+
 def handle_father(match):
     father, child = match.groups()
-    try:
-        female = list(prolog.query(f"female({father})"))
-    except Exception:
-        female = False
-    if female:
-        print(f"That's impossible!")
+
+    if father == child:
+        print("That's impossible! A person can't be their own parent.")
         return
-   
-    prolog.assertz(f"father({father}, {child})")
-    prolog.assertz(f"male({father})")
+
+    if check_gender_conflict(father, expected_gender="male"):
+        print(f"That's impossible! {father} is already declared female and cannot be a father.")
+        return
+
+    ancestor_result = list(prolog.query(f"ancestor('{child}', '{father}')"))
+    parent_result = list(prolog.query(f"parent('{child}', '{father}')"))
+    contradiction = bool(ancestor_result) or bool(parent_result) or father == child
+
+    if contradiction:
+        print("That's impossible! That would create a contradiction.")
+        print("[Debug] ancestor check:", ancestor_result)
+        print("[Debug] parent check:", parent_result)
+        print("[Debug] equality check:", father == child)
+        return
+
+    prolog.assertz(f"father('{father}', '{child}')")
+    prolog.assertz(f"male('{father}')")
     print(f"Added: father({father}, {child}) and male({father})")
 
 def handle_siblings(match):
-    a, b = match.groups()
-    prolog.assertz(f"sibling({a}, {b})")
-    prolog.assertz(f"sibling({b}, {a})")
-    print(f"Added: sibling({a}, {b}) and sibling({b}, {a})")
+    person1, person2 = match.groups()
+
+    if person1 == person2:
+        print("That's impossible! A person can't be their own sibling.")
+        return
+
+    # Check contradiction: one is parent of the other
+    contradiction = list(prolog.query(f"parent('{person1}', '{person2}')")) or \
+                    list(prolog.query(f"parent('{person2}', '{person1}')"))
+    if contradiction:
+        print("That's impossible! A parent and child cannot be siblings.")
+        return
+
+    # Check if they already share a parent
+    shared_parent = list(prolog.query(
+        f"parent(Z, '{person1}'), parent(Z, '{person2}'), '{person1}' \\= '{person2}'"
+    ))
+    if shared_parent:
+        print(f"Confirmed: {person1} and {person2} are siblings (they already share a parent).")
+        return
+
+    # Ask for common parent
+    parent = input(f"No shared parent found. Who is the parent of both {person1} and {person2}? ").strip()
+
+    if not parent or parent in [person1, person2]:
+        print("That's impossible! Invalid parent name.")
+        return
+
+    # Check if adding this parent would create a contradiction
+    contradiction = list(prolog.query(f"parent('{person1}', '{parent}')")) or \
+                    list(prolog.query(f"parent('{person2}', '{parent}')"))
+    if contradiction:
+        print("That's impossible! Adding this parent would cause a contradiction.")
+        return
+
+    # Assert both parent relationships
+    prolog.assertz(f"parent('{parent}', '{person1}')")
+    prolog.assertz(f"parent('{parent}', '{person2}')")
+    print(f"Added: parent({parent}, {person1}) and parent({parent}, {person2}) — now {person1} and {person2} are siblings.")
 
 def handle_sister(match):
     sister, sibling = match.groups()
-    try:
-        Male = list(prolog.query(f"male({sister})"))
-    except Exception:
-        Male = False
-    if Male:
-        print(f"That's impossible!")
+
+    if sister == sibling:
+        print("That's impossible! A person can't be their own sister.")
         return
-    prolog.assertz(f"sister({sister}, {sibling})")
+
+    # Gender check
+    is_male = list(prolog.query(f"male({sister})"))
+    if is_male:
+        print(f"That's impossible! {sister} is male and cannot be a sister.")
+        return
+
+    contradiction = list(prolog.query(f"parent({sister}, {sibling})")) or \
+                    list(prolog.query(f"parent({sibling}, {sister})"))
+    if contradiction:
+        print("That's impossible! A parent and child cannot be siblings.")
+        return
+
     prolog.assertz(f"female({sister})")
-    print(f"Added: sister({sister}, {sibling}) and female({sister})")
+
+    common_parents = list(prolog.query(
+        f"parent(Z, {sister}), parent(Z, {sibling}), {sister} \\= {sibling}"
+    ))
+    if common_parents:
+        print(f"Added: female({sister}) — confirmed {sister} is the sister of {sibling}.")
+        return
+
+    parent = input(f"No shared parent found. Who is the parent of both {sister} and {sibling}? ").strip()
+    if not parent or parent in [sister, sibling]:
+        print("That's impossible! Invalid parent name.")
+        return
+
+    contradiction = list(prolog.query(f"parent({sister}, {parent})")) or \
+                    list(prolog.query(f"parent({sibling}, {parent})"))
+    if contradiction:
+        print("That's impossible! Adding this parent would cause a contradiction.")
+        return
+
+    prolog.assertz(f"parent({parent}, {sister})")
+    prolog.assertz(f"parent({parent}, {sibling})")
+    print(f"Added: female({sister}), parent({parent}, {sister}), parent({parent}, {sibling}) — now {sister} is the sister of {sibling}.")
 
 def handle_mother(match):
     mother, child = match.groups()
-    try:
-        # Check if already declared male
-        is_male = list(prolog.query(f"male({mother})"))
-    except Exception:
-        is_male = False
 
-    if is_male:
-        print(f"That's impossible! {mother} is male and cannot be a mother.")
+    if mother == child:
+        print("That's impossible! A person can't be their own parent.")
         return
 
-    try:
-        has_mother = list(prolog.query(f"mother(X, {child})"))
-        is_grandmother = list(prolog.query(f"grandmother({mother}, {child})"))
-    except Exception:
-        has_mother = False
-        is_grandmother = False
-
-    if has_mother:
-        print(f"That's impossible! {child} already has a mother.")
-        return
-    if is_grandmother:
-        print(f"That's impossible! A grandmother can't also be the mother of her grandchild.")
+    if check_gender_conflict(mother, expected_gender="female"):
+        print(f"That's impossible! {mother} is already declared male and cannot be a mother.")
         return
 
-    prolog.assertz(f"mother({mother}, {child})")
-    prolog.assertz(f"female({mother})")
+    ancestor_result = list(prolog.query(f"ancestor('{child}', '{mother}')"))
+    parent_result = list(prolog.query(f"parent('{child}', '{mother}')"))
+    contradiction = bool(ancestor_result) or bool(parent_result) or mother == child
+
+    if contradiction:
+        print("That's impossible! That would create a contradiction.")
+        print("[Debug] ancestor check:", ancestor_result)
+        print("[Debug] parent check:", parent_result)
+        print("[Debug] equality check:", mother == child)
+        return
+
+    prolog.assertz(f"mother('{mother}', '{child}')")
+    prolog.assertz(f"female('{mother}')")
     print(f"Added: mother({mother}, {child}) and female({mother})")
-
 
 def handle_grandmother(match):
     grandmother, grandchild = match.groups()
-    try:
-        Male = list(prolog.query(f"male({grandmother})"))
-        # Prevent circular relationship: grandchild cannot be the grandmother of a grandmother
-        circular = list(prolog.query(f"grandparent({grandchild}, {grandmother})"))
-        # Prevent grandmother from being the mother or father of the grandchild
-        is_mother = list(prolog.query(f"mother({grandmother}, {grandchild})"))
-        is_father = list(prolog.query(f"father({grandmother}, {grandchild})"))
-        # Prevent child's mother or father from being the grandmother
-        parent_is_grandmother = list(prolog.query(f"mother(X, {grandchild}), grandmother({grandmother}, {grandchild}), X={grandmother}")) or \
-                                list(prolog.query(f"father(X, {grandchild}), grandmother({grandmother}, {grandchild}), X={grandmother}"))
-    except Exception:
-        Male = False
-        circular = False
-        is_mother = False
-        is_father = False
-        parent_is_grandmother = False
-    if Male:
-        print(f"That's impossible!")
+
+    if grandmother == grandchild:
+        print("That's impossible! A person can't be their own grandchild.")
         return
-    if circular:
-        print(f"That's impossible! A child can't be the grandmother of a father.")
+
+    is_male = list(prolog.query(f"male({grandmother})"))
+    if is_male:
+        print(f"That's impossible! {grandmother} is male and cannot be a grandmother.")
         return
-    if is_mother or is_father:
-        print(f"That's impossible! A grandmother can't be the mother or father of her grandchild.")
+
+    middle = input(f"Who is the child of {grandmother} and parent of {grandchild}? ").strip()
+    if not middle or middle in [grandmother, grandchild]:
+        print("That's impossible! Invalid intermediate person.")
         return
-    if parent_is_grandmother:
-        print(f"That's impossible! A child's mother or father can't also be their grandmother.")
+
+    contradiction = list(prolog.query(f"parent({grandchild}, {middle})")) or \
+                    list(prolog.query(f"parent({middle}, {grandmother})"))
+    if contradiction:
+        print("That's impossible! That would create a contradiction.")
         return
-    prolog.assertz(f"grandmother({grandmother}, {grandchild})")
+
+    prolog.assertz(f"parent({grandmother}, {middle})")
+    prolog.assertz(f"parent({middle}, {grandchild})")
     prolog.assertz(f"female({grandmother})")
-    print(f"Added: grandmother({grandmother}, {grandchild}) and female({grandmother})")
+    print(f"Added: parent({grandmother}, {middle}), parent({middle}, {grandchild}), female({grandmother}) — {grandmother} is now a grandmother of {grandchild}.")
 
 def handle_child(match):
     child, parent = match.groups()
     try:
-        circular = list(prolog.query(f"child({parent}, {child})")) or \
-                   list(prolog.query(f"parent({child}, {parent})")) #parents cannot be children of their own child
+        # Prevent circular parent-child relationships
+        circular = list(prolog.query(f"parent({child}, {parent})")) or \
+                   list(prolog.query(f"child({parent}, {child})")) or \
+                   list(prolog.query(f"{child} = {parent}"))
     except Exception:
         circular = False
+
     if circular:
-        print(f"That's impossible!")
+        print(f"That's impossible! A person can't be their own parent or child.")
         return
-    prolog.assertz(f"child({child}, {parent})")
-    print(f"Added: child({child}, {parent})")
+
+    # Only assert the parent relationship; child will be inferred
+    prolog.assertz(f"parent({parent}, {child})")
+    print(f"Added: parent({parent}, {child})")
+
 
 def handle_daughter(match):
-    daughter, parent = match.groups()   
-    try:
-        circular = list(prolog.query(f"child({parent}, {daughter})")) or \
-                   list(prolog.query(f"parent({daughter}, {parent})")) 
-    except Exception:
-        circular = False
-    if circular:
-        print(f"That's impossible!")
+    daughter, parent = match.groups()
+
+    if daughter == parent:
+        print("That's impossible! A person can't be their own parent.")
         return
-    prolog.assertz(f"daughter({daughter}, {parent})")
-    print(f"Added: daughter({daughter}, {parent})")
+
+    if check_gender_conflict(daughter, expected_gender="female"):
+        print(f"That's impossible! {daughter} is already declared male and cannot be a daughter.")
+        return
+
+    # Safely detect contradictions
+    try:
+        ancestor_result = list(prolog.query(f"ancestor('{daughter}', '{parent}')"))
+        parent_result = list(prolog.query(f"parent('{daughter}', '{parent}')"))
+
+        # Only treat as contradiction if at least one *non-empty* match
+        has_contradiction = any(len(r) > 0 for r in ancestor_result + parent_result) or daughter == parent
+
+        if has_contradiction:
+            print("That's impossible! That would create a contradiction.")
+            print("[Debug] ancestor check:", ancestor_result)
+            print("[Debug] parent check:", parent_result)
+            print("[Debug] equality check:", daughter == parent)
+            return
+
+    except Exception as e:
+        print("[Error] Prolog query failed:", e)
+        return
+
+    # All clear — assert
+    prolog.assertz(f"parent('{parent}', '{daughter}')")
+    prolog.assertz(f"female('{daughter}')")
+    print(f"Added: parent({parent}, {daughter}), female({daughter}) — {daughter} is now the daughter of {parent}.")
+
 
 def handle_uncle(match):
-    uncle, nephew = match.groups()
+    uncle, niece_or_nephew = match.groups()
+
+    if uncle == niece_or_nephew:
+        print("That's impossible! A person can't be their own uncle.")
+        return
+
+    # Check for gender conflict
+    if check_gender_conflict(uncle, expected_gender="male"):
+        print(f"That's impossible! {uncle} is female and cannot be an uncle.")
+        return
+
+    # Declare uncle as male
+    prolog.assertz(f"male('{uncle}')")
+
+    # Ask for the intermediate person: sibling of uncle, parent of target
+    middle = input(f"Who is the parent of {niece_or_nephew} and sibling of {uncle}? ").strip()
+
+    if not middle or middle == uncle or middle == niece_or_nephew:
+        print("That's impossible! Invalid intermediate person.")
+        return
+
+    # Ask for the shared parent of uncle and middle to establish sibling relationship
+    parent = input(f"Who is the parent of both {uncle} and {middle}? ").strip()
+
+    if not parent or parent in [uncle, middle, niece_or_nephew]:
+        print("That's impossible! Invalid parent name.")
+        return
+
+    # Check for contradiction (e.g. loops or self-parenting)
     try:
-        Male = list(prolog.query(f"male({uncle})"))
-        # Prevent circular relationship: uncle cannot be nephew of uncle
-        circular = list(prolog.query(f"uncle({nephew}, {uncle})"))
-        # Prevent child's mother or father from being the uncle
-        parent_is_uncle = list(prolog.query(f"parent({uncle}, {nephew})"))
+        contradiction = list(prolog.query(f"parent('{uncle}', '{parent}')")) or \
+                        list(prolog.query(f"parent('{middle}', '{parent}')")) or \
+                        list(prolog.query(f"parent('{niece_or_nephew}', '{middle}')")) or \
+                        list(prolog.query(f"'{uncle}' = '{niece_or_nephew}'")) or \
+                        list(prolog.query(f"'{middle}' = '{niece_or_nephew}'"))
     except Exception:
-        Male = False
-        circular = False
-        parent_is_uncle = False
-    if Male:
-        print(f"That's impossible!")
+        contradiction = False
+
+    if contradiction:
+        print("That's impossible! That would create a contradiction.")
         return
-    if circular:
-        print(f"That's impossible! A child can't be the uncle of a father.")
-        return
-    if parent_is_uncle:
-        print(f"That's impossible! A child's mother or father can't also be their uncle.")
-        return
-    prolog.assertz(f"uncle({uncle}, {nephew})")
-    print(f"Added: uncle({uncle}, {nephew})")
+
+    # Assert siblinghood and parental links
+    prolog.assertz(f"parent('{parent}', '{uncle}')")
+    prolog.assertz(f"parent('{parent}', '{middle}')")
+    prolog.assertz(f"parent('{middle}', '{niece_or_nephew}')")
+
+    print(f"Added: male({uncle}), parent({parent}, {uncle}), parent({parent}, {middle}), parent({middle}, {niece_or_nephew}) — {uncle} is now the uncle of {niece_or_nephew}.")
 
 def handle_brother(match):
     brother, sibling = match.groups()
-    try:
-        circular = list(prolog.query(f"child({brother}, {sibling})")) and \
-                   list(prolog.query(f"child({sibling}, {brother})"))
-    except Exception:
-        circular = False
-    if circular:
-        print(f"That's impossible! A brother can't be a sibling of himself.")
+
+    if brother == sibling:
+        print("That's impossible! A person can't be their own brother.")
         return
-    prolog.assertz(f"brother({brother}, {sibling})")
+
+    # Gender check
+    is_female = list(prolog.query(f"female({brother})"))
+    if is_female:
+        print(f"That's impossible! {brother} is female and cannot be a brother.")
+        return
+
+    # Contradiction: parent-child relationship
+    contradiction = list(prolog.query(f"parent({brother}, {sibling})")) or \
+                    list(prolog.query(f"parent({sibling}, {brother})"))
+    if contradiction:
+        print("That's impossible! A parent and child cannot be siblings.")
+        return
+
     prolog.assertz(f"male({brother})")
-    print(f"Added: brother({brother}, {sibling}) and male({brother})")
+
+    common_parents = list(prolog.query(
+        f"parent(Z, {brother}), parent(Z, {sibling}), {brother} \\= {sibling}"
+    ))
+    if common_parents:
+        print(f"Added: male({brother}) — confirmed {brother} is the brother of {sibling}.")
+        return
+
+    parent = input(f"No shared parent found. Who is the parent of both {brother} and {sibling}? ").strip()
+    if not parent or parent in [brother, sibling]:
+        print("That's impossible! Invalid parent name.")
+        return
+
+    contradiction = list(prolog.query(f"parent({brother}, {parent})")) or \
+                    list(prolog.query(f"parent({sibling}, {parent})"))
+    if contradiction:
+        print("That's impossible! Adding this parent would cause a contradiction.")
+        return
+
+    prolog.assertz(f"parent({parent}, {brother})")
+    prolog.assertz(f"parent({parent}, {sibling})")
+    print(f"Added: male({brother}), parent({parent}, {brother}), parent({parent}, {sibling}) — now {brother} is the brother of {sibling}.")
 
 def handle_parents(match):
     parent1, parent2, child = match.groups()
@@ -182,60 +337,121 @@ def handle_parents(match):
 
 def handle_grandfather(match):
     grandfather, grandchild = match.groups()
-    try:
-        circular = list(prolog.query(f"grandfather({grandchild}, {grandfather})")) and \
-                   list(prolog.query(f"female({grandfather})")) # grandfather cannot be female
-    except Exception:
-        circular = False
-    if circular:
-        print(f"That's impossible! A grandfather can't be a grandchild of himself.")
-        return
-    prolog.assertz(f"grandfather({grandfather}, {grandchild})")
-    prolog.assertz(f"male({grandfather})")
-    print(f"Added: grandfather({grandfather}, {grandchild}) and male({grandfather})")
 
+    if grandfather == grandchild:
+        print("That's impossible! A person can't be their own grandchild.")
+        return
+
+    is_female = list(prolog.query(f"female({grandfather})"))
+    if is_female:
+        print(f"That's impossible! {grandfather} is female and cannot be a grandfather.")
+        return
+
+    middle = input(f"Who is the child of {grandfather} and parent of {grandchild}? ").strip()
+    if not middle or middle in [grandfather, grandchild]:
+        print("That's impossible! Invalid intermediate person.")
+        return
+
+    contradiction = list(prolog.query(f"parent({grandchild}, {middle})")) or \
+                    list(prolog.query(f"parent({middle}, {grandfather})"))
+    if contradiction:
+        print("That's impossible! That would create a contradiction.")
+        return
+
+    prolog.assertz(f"parent({grandfather}, {middle})")
+    prolog.assertz(f"parent({middle}, {grandchild})")
+    prolog.assertz(f"male({grandfather})")
+    print(f"Added: parent({grandfather}, {middle}), parent({middle}, {grandchild}), male({grandfather}) — {grandfather} is now a grandfather of {grandchild}.")
 
 def handle_children(match):
     children = match.groups()
     parent = children[-1]
+
     for child in children[:-1]:
-        try:
-            circular = list(prolog.query(f"child({parent}, {child})")) or \
-                        list(prolog.query(f"father({child}, {parent})"))
-        except Exception:
-            circular = False
-        if circular:
-            print(f"That's impossible! A parent can't be a child of their own child.")
+        if child == parent:
+            print(f"That's impossible! A person can't be their own parent.")
             return
-        prolog.assertz(f"child({child}, {parent})")
+
+        # Check for circular contradiction
+        try:
+            contradiction = list(prolog.query(f"parent({child}, {parent})")) or \
+                            list(prolog.query(f"{child} = {parent}"))
+        except Exception:
+            contradiction = False
+
+        if contradiction:
+            print(f"That's impossible! Adding parent({parent}, {child}) would cause a contradiction.")
+            return
+
+        # Assert parent relationship (child is derived by rule)
+        prolog.assertz(f"parent({parent}, {child})")
+        print(f"Added: parent({parent}, {child})")
+
 
 def handle_son(match):
     son, parent = match.groups()
-    try:
-        circular = list(prolog.query(f"child({parent}, {son})")) or \
-                   list(prolog.query(f"father({son}, {parent})")) or \
-                   list(prolog.query(f"mother({son}, {parent})")) #father and mother are also considered parents, cannot be child of child
-    except Exception:
-        circular = False
-    if circular:
-        print(f"That's impossible! A parent can't be a child of their own child.")
-        return
-    prolog.assertz(f"son({son}, {parent})")
-    prolog.assertz(f"male({son})")
-    print(f"Added: son({son}, {parent}) and male({son})")
 
-def handle_aunt(match): ####################BUGS FOR RELATIONS IN RELATIONS.PL, NEED TO CHANGE ASSERTZ TO FOLLOW RULES###############################
-    aunt, niece = match.groups()
-    try:
-        circular = list(prolog.query(f"aunt({aunt}, {aunt})"))
-    except Exception:
-        circular = False
-    if circular:
-        print(f"That's impossible! An aunt can't be a niece of herself.")
+    if son == parent:
+        print("That's impossible! A person can't be their own parent.")
         return
-    prolog.assertz(f"aunt({aunt}, {niece})")
-    print(f"Added: aunt({aunt}, {niece})")
 
+    if check_gender_conflict(son, expected_gender="male"):
+        print(f"That's impossible! {son} is already declared female and cannot be a son.")
+        return
+
+    # Check for contradiction
+    ancestor_result = list(prolog.query(f"ancestor('{son}', '{parent}')"))
+    parent_result = list(prolog.query(f"parent('{son}', '{parent}')"))
+    contradiction = bool(ancestor_result) or bool(parent_result) or son == parent
+
+    if contradiction:
+        print("That's impossible! That would create a contradiction.")
+        print("[Debug] ancestor check:", ancestor_result)
+        print("[Debug] parent check:", parent_result)
+        print("[Debug] equality check:", son == parent)
+        return
+
+    prolog.assertz(f"parent('{parent}', '{son}')")
+    prolog.assertz(f"male('{son}')")
+    print(f"Added: parent({parent}, {son}), male({son}) — {son} is now the son of {parent}.")
+
+def handle_aunt(match):
+    aunt, target = match.groups()
+
+    if aunt == target:
+        print("That's impossible! A person can't be their own aunt.")
+        return
+
+    is_male = list(prolog.query(f"male({aunt})"))
+    if is_male:
+        print(f"That's impossible! {aunt} is male and cannot be an aunt.")
+        return
+
+    prolog.assertz(f"female({aunt})")
+
+    middle = input(f"Who is the parent of {target} and sibling of {aunt}? ").strip()
+    if not middle or middle in [aunt, target]:
+        print("That's impossible! Invalid intermediate person.")
+        return
+
+    parent = input(f"Who is the parent of both {aunt} and {middle}? ").strip()
+    if not parent or parent in [aunt, middle, target]:
+        print("That's impossible! Invalid parent name.")
+        return
+
+    contradiction = list(prolog.query(f"parent({aunt}, {parent})")) or \
+                    list(prolog.query(f"parent({middle}, {parent})")) or \
+                    list(prolog.query(f"parent({target}, {middle})")) or \
+                    list(prolog.query(f"{aunt} = {target}")) or \
+                    list(prolog.query(f"{middle} = {target}"))
+    if contradiction:
+        print("That's impossible! That would create a contradiction.")
+        return
+
+    prolog.assertz(f"parent({parent}, {aunt})")
+    prolog.assertz(f"parent({parent}, {middle})")
+    prolog.assertz(f"parent({middle}, {target})")
+    print(f"Added: female({aunt}), parent({parent}, {aunt}), parent({parent}, {middle}), parent({middle}, {target}) — {aunt} is now the aunt of {target}.")
 
 patterns = [
     (r"(\w+)\s+is the father of\s+(\w+)\.?", handle_father),
