@@ -1,7 +1,7 @@
 :- dynamic father/2, mother/2, parent/2, male/1, female/1, ancestor/2.
 %rules
-parent(X, Y) :- father(X, Y).
-parent(X, Y) :- mother(X, Y).
+father(X, Y) :- parent(X, Y), male(X).
+mother(X, Y) :- parent(X, Y), female(X).
 
 child(X, Y) :- parent(Y, X).
 sibling(X, Y) :-
