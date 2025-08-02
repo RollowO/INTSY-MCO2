@@ -1,0 +1,46 @@
+Types of sentence inputs:
+
+
+X and Y are siblings
+X is a son of Y
+X is a sister of Y
+X is a grandmother of Y
+X is a grandfather of Y
+X is a child of Y
+X is a daughter of Y
+X is a grandfather of Y
+X is a brother of Y
+X is an uncle of Y
+X is an aunt of Y
+X is the mother of Y
+X is the father of Y
+
+X and Y are the parents of Z
+X,Y and Z are children of A
+
+Types of question inputs:
+Is X a sister of Y? 
+Is X a brother of Y? 
+Is X the mother of Y? 
+Is X the father of Y? 
+Is X a grandmother of Y? 
+Is X a grandfather of Y?
+Is X a daughter of Y? 
+Is X a son of Y? 
+Is X a child of Y? 
+Is X an aunt of Y?
+Is X an uncle of Y? 
+Are X and Y siblings?
+Are X and Y the parents of Z? 
+Are X, Y and Z children of A?
+Are X and Y relatives?
+
+Who are the siblings of X?
+Who are the sisters of X?
+Who are the brothers of X?
+Who are the parents of ?
+Who is the mother of X?
+Who is the father of X?
+Who are the daughters of Y?
+Who are the sons of Y?
+Who are the children of Y?

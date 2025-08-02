@@ -3,7 +3,7 @@ from pyswip import Prolog
 import os
 
 prolog = Prolog()
-prolog.consult("INTSY-MCO2/Relations.pl")
+prolog.consult("./Relations.pl")
 
 def check_gender_conflict(name, expected_gender):
     opposite = "male" if expected_gender == "female" else "female"
