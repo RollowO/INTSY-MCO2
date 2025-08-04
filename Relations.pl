@@ -1,72 +1,38 @@
-:- dynamic father/2, mother/2, parent/2, male/1, female/1, ancestor/2.
-%rules
-father(X, Y) :- parent(X, Y), male(X).
-mother(X, Y) :- parent(X, Y), female(X).
+% facts
 
-child(X, Y) :- parent(Y, X).
-sibling(X, Y) :-
-    parent(Z, X),
-    parent(Z, Y),
-    X \= Y.
+% gender
+male(X).
+female(X).
 
-brother(X, Y) :-
-    sibling(X, Y),
-    male(X).
+% parents
+parent(X,Y).
+mother(X,Y) :- parent(X,Y), female(X), X \= Y.
+father(X,Y) :- parent(X,Y), male(X), X \= Y.
 
-sister(X, Y) :-
-    sibling(X, Y),
-    female(X).
+% X and Y are the parents of Z
+parents_of(X,Y,Z) :- child(Z,X), child(Z,Y), X \= Y
 
-grandparent(X, Y) :-
-    parent(X, Z),
-    parent(Z, Y).
+% X Y and Z are the children of A
+children_of(X,Y,Z,A) :- child(X,A),child(Y,A),child(Z,A), 
+            X \= Y, X \= Z, Y \= Z.
 
-grandchild(X, Y) :-
-    grandparent(Y, X).
+% children
+child(X,Y) :- parent(Y,X), X \= Y.
+son(X,Y) :- child(X,Y), male(X), X \= Y.
+daughter(X,Y) :- child(X,Y), daughter(X), X \= Y.
 
-grandfather(X, Y) :- father(X, Z), parent(Z, Y).
-grandmother(X, Y) :- mother(X, Z), parent(Z, Y).
 
-uncle(X, Y) :-
-    male(X),
-    sibling(X, Z),
-    parent(Z, Y).
+%  grandparents A is subbed to any value
+grandfather(X,Y) :- male(X), parent(X,A), parent(A,Y). 
+grandmother(X,Y) :- female(X), parent(X,A), parent(A,Y).
 
-aunt(X, Y) :-
-    female(X),
-    sibling(X, Z),
-    parent(Z, Y).
+% siblings
 
-cousin(X, Y) :-
-    parent(A, X),
-    parent(B, Y),
-    sibling(A, B).
+siblings(X,Y) :- child(X,P), child(Y,P), X \= Y.
+brother(X,Y) :- siblings(X,Y), male(X), X \= Y.
+sister(X,Y) :- siblings(X,Y), female(X), X\= Y.
 
-daughter(X, Y) :-
-    child(X, Y),
-    female(X).
-
-son(X, Y) :-
-    child(X, Y),
-    male(X).
-
-%relatives
-relatives(X, Y) :- sibling(X, Y).
-relatives(X, Y) :- parent(X, Y).
-relatives(X, Y) :- parent(Y, X).
-relatives(X, Y) :- grandparent(X, Y).
-relatives(X, Y) :- grandparent(Y, X).
-relatives(X, Y) :- uncle(X, Y).
-relatives(X, Y) :- uncle(Y, X).
-relatives(X, Y) :- cousin(X, Y).
-relatives(X, Y) :- cousin(Y, X).
-
-%Recursive relations
-% Depth-limited ancestor
-ancestor(X, Y, 0) :- parent(X, Y).
-ancestor(X, Y, N) :-
-    N > 0,
-    parent(X, Z),
-    N1 is N - 1,
-    ancestor(Z, Y, N1).
+% relatives
+uncle(X,Y) :- brother(X,P), child(Y,P), X\=Y
+aunt(X,Y) :- sister(X,P), child(Y,P), X\=Y
 

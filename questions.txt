@@ -1,22 +1,22 @@
 Types of sentence inputs:
+! marker = implemented
 
+X and Y are siblings !
+X is a son of Y !
+X is a sister of Y !
+X is a grandmother of Y !
+X is a grandfather of Y !
+X is a child of Y !
+X is a daughter of Y !
+X is a grandfather of Y !
+X is a brother of Y !
+X is an uncle of Y !
+X is an aunt of Y !
+X is the mother of Y !
+X is the father of Y !
 
-X and Y are siblings
-X is a son of Y
-X is a sister of Y
-X is a grandmother of Y
-X is a grandfather of Y
-X is a child of Y
-X is a daughter of Y
-X is a grandfather of Y
-X is a brother of Y
-X is an uncle of Y
-X is an aunt of Y
-X is the mother of Y
-X is the father of Y
-
-X and Y are the parents of Z
-X,Y and Z are children of A
+X and Y are the parents of Z !
+X,Y and Z are children of A !
 
 Types of question inputs:
 Is X a sister of Y? 
