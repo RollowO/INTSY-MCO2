@@ -26,7 +26,7 @@ def parse():
         r"Who are the "+word_pattern+r" of "+word_pattern+r"\?",
         r"Who is the "+word_pattern+r" of "+word_pattern+r"\?",
         r"Are "+word_pattern+r" and "+word_pattern+r" relatives\?"
-
+        
 
 
 
