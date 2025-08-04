@@ -18,5 +18,16 @@ def parse():
     ]
 
     query_patterns=[
+        r"Are "+word_pattern+r" and "+word_pattern+r" siblings?",
+        r"Is "+word_pattern+r" a "+word_pattern+r" of "+word_pattern+r"\?",
+        r"Is "+word_pattern+r" an [(uncle)|(aunt)] of "+word_pattern+r"\?",
+        r"Are "+word_pattern+r" and "+word_pattern+r" the parent of "+word_pattern+r"\?",
+        r"Are "+word_pattern+r", "+word_pattern+r" and "+word_pattern+r" children of "+word_pattern+r"\?",
+        r"Who are the "+word_pattern+r" of "+word_pattern+r"\?",
+        r"Who is the "+word_pattern+r" of "+word_pattern+r"\?",
+        r"Are "+word_pattern+r" and "+word_pattern+r" relatives\?"
+
+
+
 
     ]
