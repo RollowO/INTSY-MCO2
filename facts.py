@@ -92,7 +92,8 @@ class Facts():
         except Exception as e:
             print(f"Error asserting children fact: {e}")
 
-    def execute_typeof_family(family):
+    # function only applies to the two arguement statements
+    def execute_typeof_family(family,x,y,p):
         if family == "sister":
         
         elif family == "brother":
