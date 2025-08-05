@@ -202,12 +202,10 @@ class Query():
             print(result["X"])
     
     def find_children(x, p):
-        results = list(p.query("children(X, Y, Z, {})".format(x)))
+        results = list(p.query("child(X, {})".format(x)))
         print("Children of", x + ":")
         for result in results:
             print(result["X"])
-            print(result["Y"])
-            print(result["Z"])
 
 
             

@@ -12,6 +12,8 @@ class Facts():
     def son(p,x,y):
         try:
             p.assertz("son({},{})".format(x,y))
+            p.assertz("male({})".format(x))
+            p.assertz("parent({},{})".format(x,y))
             print("Son fact asserted successfully.")
         except Exception as e:
             print(f"Error asserting son fact: {e}")
@@ -20,6 +22,7 @@ class Facts():
         try:
             p.assertz(f"siblings({x}, {y})")
             p.assertz(f"female({x})")
+            p.assertz(f"siblings({y}, {x})")
             print("Sister fact asserted successfully.")
         except Exception as e:
             print(f"Error asserting sister fact: {e}")
@@ -28,6 +31,7 @@ class Facts():
     def grandmother(p,x,y):
         try:
             p.assertz("grandmother({},{})".format(x,y))
+            p.assertz("female({})".format(x))
             print("Grandmother fact asserted successfully.")
         except Exception as e:
             print(f"Error asserting grandmother fact: {e}")
@@ -35,13 +39,14 @@ class Facts():
     def grandfather(p,x,y):
         try:
             p.assertz("grandfather({},{})".format(x,y))
+            p.assertz("male({})".format(x))
             print("Grandfather fact asserted successfully.")
         except Exception as e:
             print(f"Error asserting grandfather fact: {e}")
 
     def child(p,x,y):
         try:
-            p.assertz("child({},{})".format(x,y))
+            p.assertz("parent({},{})".format(y,x))
             print("Child fact asserted successfully.")
         except Exception as e:
             print(f"Error asserting child fact: {e}")
@@ -49,20 +54,17 @@ class Facts():
     def daughter(p,x,y):
         try:
             p.assertz("daughter({},{})".format(x,y))
+            p.assertz("female({})".format(x))
+            p.assertz("parent({},{})".format(x,y))
             print("Daughter fact asserted successfully.")
         except Exception as e:
             print(f"Error asserting daughter fact: {e}")
 
-    def grandfather(p,x,y):
-        try:
-            p.assertz("grandfather({},{})".format(x,y))
-            print("Grandfather fact asserted successfully.")
-        except Exception as e:
-            print(f"Error asserting grandfather fact: {e}")
-
     def brother(p,x,y):
         try:
-            p.assertz("brother({},{})".format(x,y))
+            p.assertz("male({})".format(x))
+            p.assertz("siblings({},{})".format(x,y))
+            p.assertz("siblings({},{})".format(y,x))
             print("Brother fact asserted successfully.")
         except Exception as e:
             print(f"Error asserting brother fact: {e}")
@@ -70,6 +72,7 @@ class Facts():
     def uncle(p,x,y):
         try:
             p.assertz("uncle({},{})".format(x,y))
+            p.assertz("male({})".format(x))
             print("Uncle fact asserted successfully.")
         except Exception as e:
             print(f"Error asserting uncle fact: {e}")
@@ -77,6 +80,7 @@ class Facts():
     def aunt(p,x,y):
         try:
             p.assertz("aunt({},{})".format(x,y))
+            p.assertz("female({})".format(x))
             print("Aunt fact asserted successfully.")
         except Exception as e:
             print(f"Error asserting aunt fact: {e}")
@@ -84,6 +88,8 @@ class Facts():
     def mother(p,x,y):
         try:
             p.assertz("mother({},{})".format(x,y))
+            p.assertz("female({})".format(x))
+            p.assertz("parent({},{})".format(x,y))
             print("Mother fact asserted successfully.")
         except Exception as e:
             print(f"Error asserting mother fact: {e}")
@@ -91,6 +97,8 @@ class Facts():
     def father(p,x,y):
         try:
             p.assertz("father({},{})".format(x,y))
+            p.assertz("male({})".format(x))
+            p.assertz("parent({},{})".format(x,y))
             print("Father fact asserted successfully.")
         except Exception as e:
             print(f"Error asserting father fact: {e}")
@@ -98,13 +106,17 @@ class Facts():
     def parents(p,x,y,z):
         try:
             p.assertz("parents_of({},{},{})".format(x,y,z))
+            p.assertz("parent({},{})".format(x,z))
+            p.assertz("parent({},{})".format(y,z))
             print("Parents fact asserted successfully.")
         except Exception as e:
             print(f"Error asserting parents fact: {e}")
 
     def children(p,x,y,z,a):
         try:
-            p.assertz("children_of({},{},{},{})".format(x,y,z,a))
+            p.assertz("parent({},{})".format(a,x))
+            p.assertz("parent({},{})".format(a,y))
+            p.assertz("parent({},{})".format(a,z))
             print("Children fact asserted successfully.")
         except Exception as e:
             print(f"Error asserting children fact: {e}")
