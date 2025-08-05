@@ -1,5 +1,7 @@
 import re
 from pyswip import Prolog
+from facts import Facts
+from query import Query
 import os
 
 def todo():
@@ -13,7 +15,7 @@ def get_family_type(match):
     return match.group(1)
 
 
-def parse(user_input):
+def parse(user_input,prolog):
     # thank you stalgcm for teaching me regex - renzo
     family_types_one = r"(sister|brother|grandmother|grandfather|child|daughter|son)"
     family_types_two = r"(mother|father)"
@@ -25,13 +27,15 @@ def parse(user_input):
         word_pattern+r" is the (mother|father) of "+word_pattern,
         word_pattern+r" is an (uncle|aunt) of "+word_pattern,
         word_pattern+r" and "+word_pattern+r" are siblings",
-        word_pattern+r", "+word_pattern+r" and "+word_pattern+r" are children of "+word_pattern
+        word_pattern+r", "+word_pattern+r" and "+word_pattern+r" are children of "+word_pattern,
+        word_pattern+r" and "+word_pattern+r" are the parents of "+word_pattern
     ]
 
     query_patterns=[
-        r"Are "+word_pattern+r" and "+word_pattern+r" siblings\?",
+        r"Are "+word_pattern+r" and "+word_pattern+r" siblings\?", 
         r"Is "+word_pattern+r" a "+family_types_one+r" of "+word_pattern+r"\?",
         r"Is "+word_pattern+r" an "+family_types_three+r" of "+word_pattern+r"\?",
+        r"Is "+word_pattern+r" the "+family_types_two+r" of "+word_pattern+r"\?",
         r"Are "+word_pattern+r" and "+word_pattern+r" the parents of "+word_pattern+r"\?",
         r"Are "+word_pattern+r", "+word_pattern+r" and "+word_pattern+r" children of "+word_pattern+r"\?",
         r"Who are the "+family_types_four+r" of "+word_pattern+r"\?",
@@ -43,21 +47,32 @@ def parse(user_input):
     for index,pattern in enumerate(fact_patterns):
         match = re.fullmatch(pattern,user_input)
         if(match):
-            print("MATCHED")
-            print(get_family_type(match))
             if(index == 0):
                 family_type = get_family_type(match)
-                todo()
+                Facts.execute_typeof_family(family_type,match.group(0),match.group(2),prolog)
             elif(index == 1):
                 family_type = get_family_type(match)
-                todo()
+                Facts.execute_typeof_family(family_type,match.group(0),match.group(2),prolog)
             elif(index == 2):
                 family_type = get_family_type(match)
-                todo()
+                Facts.execute_typeof_family(family_type,match.group(0),match.group(2),prolog)
             elif(index == 3):
+                name_one = match.group(0)
+                name_two = match.group(1)
+                Facts.siblings(prolog,name_one,name_two)
                 todo()
             elif(index == 4):
+                name_one = match.group(0)
+                name_two = match.group(1)
+                name_three = match.group(2)
+                name_four = match.group(3)
+                Facts.children(prolog,name_one,name_two,name_three,name_four)
                 todo()
+            elif(index == 5):
+                name_one = match.group(0)
+                name_two = match.group(1)
+                name_three = match.group(2)
+                Facts.parents(prolog,name_one,name_two,name_three)
                 
     for index,pattern in enumerate(query_patterns):
         match = re.fullmatch(pattern,user_input)
@@ -65,12 +80,26 @@ def parse(user_input):
             print("MATCHED QUERY")
             print(match.groups())
             if(index == 0):
-                todo()
+                name_one = match.group(0)
+                name_two = match.group(1)
+                Query.query_siblings(p=prolog,x=name_one,y=name_two)
             elif(index == 1):
+                family_type = get_family_type(match)
+                name_one = match.group(0)
+                name_two = match.group(2)
+                Query.execute_is_x_typeof_y(family_type,x=name_one,y=name_two,p=prolog)
                 todo()
             elif(index == 2):
+                family_type = get_family_type(match)
+                name_one = match.group(0)
+                name_two = match.group(2)
+                Query.execute_is_x_typeof_y(family_type,x=name_one,y=name_two,p=prolog)
                 todo()
             elif(index == 3):
+                family_type = get_family_type(match)
+                name_one = match.group(0)
+                name_two = match.group(2)
+                Query.execute_is_x_typeof_y(family_type,x=name_one,y=name_two,p=prolog)
                 todo()
             elif(index == 4):
                 todo()
@@ -79,6 +108,8 @@ def parse(user_input):
             elif(index == 6):
                 todo()
             elif(index == 7):
+                todo()
+            elif(index == 8):
                 todo()
 
 
