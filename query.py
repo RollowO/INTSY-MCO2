@@ -5,9 +5,9 @@ class Query():
         try:
             results = bool(list(p.query("siblings({}, {})".format(x, y))))
             if results:
-                return "Yes"
+                print("Yes")
             else:
-                return "No"
+                print("No")
         except Exception as e:
             print(f"Error querying siblings: {e}")
 
@@ -15,9 +15,9 @@ class Query():
         try:
             results = bool(list(p.query("son({}, {})".format(x, y))))
             if results:
-                return "Yes"
+                print("Yes")
             else:
-                return "No"
+                print("No")
         except Exception as e:
             print(f"Error querying son: {e}")
 
@@ -25,9 +25,9 @@ class Query():
         try:
             results = bool(list(p.query("sister({}, {})".format(x, y))))
             if results:
-                return "Yes"
+                print("Yes")
             else:
-                return "No"
+                print("No")
         except Exception as e:
             print(f"Error querying sister: {e}")
 
@@ -35,9 +35,9 @@ class Query():
         try:
             results = bool(list(p.query("grandmother({}, {})".format(x, y))))
             if results:
-                return "Yes"
+                print("Yes")
             else:
-                return "No"
+                print("No")
         except Exception as e:
             print(f"Error querying grandmother: {e}")
 
@@ -45,9 +45,9 @@ class Query():
         try:
             results = bool(list(p.query("grandfather({}, {})".format(x, y))))
             if results:
-                return "Yes"
+                print("Yes")
             else:
-                return "No"
+                print("No")
         except Exception as e:
             print(f"Error querying grandfather: {e}")
 
@@ -55,9 +55,9 @@ class Query():
         try:
             results = bool(list(p.query("child({}, {})".format(x, y))))
             if results:
-                return "Yes"
+                print("Yes")
             else:
-                return "No"
+                print("No")
         except Exception as e:
             print(f"Error querying child: {e}")
 
@@ -65,9 +65,9 @@ class Query():
         try:
             results = bool(list(p.query("daughter({}, {})".format(x, y))))
             if results:
-                return "Yes"
+                print("Yes")
             else:
-                return "No"
+                print("No")
         except Exception as e:
             print(f"Error querying daughter: {e}")
 
@@ -75,9 +75,9 @@ class Query():
         try:
             results = bool(list(p.query("brother({}, {})".format(x, y))))
             if results:
-                return "Yes"
+                print("Yes")
             else:
-                return "No"
+                print("No")
         except Exception as e:
             print(f"Error querying brother: {e}")
 
@@ -85,9 +85,9 @@ class Query():
         try:
             results = bool(list(p.query("uncle({}, {})".format(x, y))))
             if results:
-                return "Yes"
+                print("Yes")
             else:
-                return "No"
+                print("No")
         except Exception as e:
             print(f"Error querying uncle: {e}")
 
@@ -95,9 +95,9 @@ class Query():
         try:
             results = bool(list(p.query("aunt({}, {})".format(x, y))))
             if results:
-                return "Yes"
+                print("Yes")
             else:
-                return "No"
+                print("No")
         except Exception as e:
             print(f"Error querying aunt: {e}")
 
@@ -105,9 +105,9 @@ class Query():
         try:
             results = bool(list(p.query("mother({}, {})".format(x, y))))
             if results:
-                return "Yes"
+                print("Yes")
             else:
-                return "No"
+                print("No")
         except Exception as e:
             print(f"Error querying mother: {e}")
 
@@ -115,9 +115,9 @@ class Query():
         try:
             results = bool(list(p.query("father({}, {})".format(x, y))))
             if results:
-                return "Yes"
+                print("Yes")
             else:
-                return "No"
+                print("No")
         except Exception as e:
             print(f"Error querying father: {e}")
 
@@ -125,9 +125,9 @@ class Query():
         try:
             results = bool(list(p.query("parents({},{},{})".format(x,y,z))))
             if results:
-                return "Yes"
+                print("Yes")
             else:
-                return "No"
+                print("No")
         except Exception as e:
             print(f"Error querying parents: {e}")
 
@@ -135,9 +135,9 @@ class Query():
         try:
             results = bool(list(p.query("children({},{},{},{})".format(x,y,z,a))))
             if results:
-                return "Yes"
+                print("Yes")
             else:
-                return "No"
+                print("No")
         except Exception as e:
             print(f"Error querying children: {e}")
 
@@ -145,48 +145,72 @@ class Query():
         try:
             results = bool(list(p.query("relatives({}, {})".format(x, y))))
             if results:
-                return "Yes"
+                print("Yes")
             else:
-                return "No"
+                print("No")
         except Exception as e:
             print(f"Error querying relatives: {e}")
 
     # LIST QUERIES, WHO ARE X OF Y?
     def find_siblings( x, p):
-        results = list(p.query("siblings({}, X)".format(x)))
-        return [result['X'] for result in results]
+        results = list(p.query("siblings(X, {})".format(x)))
+        print("Sibling/s of", x + ":")
+        for result in results:
+            print(result["X"])
     
     def find_sisters( x, p):
-        results = list(p.query("sister({}, X)".format(x)))
-        return [result['X'] for result in results]
+        results = list(p.query("sister(X, {})".format(x)))
+        print("Sister/s of", x + ":")
+        for result in results:
+            print(result["X"])
     
     def find_brothers( x, p):
-        results = list(p.query("brother({}, X)".format(x)))
-        return [result['X'] for result in results]
+        results = list(p.query("brother(X, {})".format(x)))
+        print("Brother/s of", x + ":")
+        for result in results:
+            print(result["X"])
 
     def find_parents( x, p):
-        results = list(p.query("parents({}, X, Y)".format(x)))
-        return [(result['X'], result['Y']) for result in results]
+        results = list(p.query("parents(X, Y, {})".format(x)))
+        print("Parent/s of", x + ":")
+        for result in results:
+            print(result["X"])
+            print(result["Y"])
 
     def find_mother( x, p):
-        results = list(p.query("mother({}, X)".format(x)))
-        return [result['X'] for result in results]
+        results = list(p.query("mother(X, {})".format(x)))
+        print("Mother of", x + ":")
+        for result in results:
+            print(result["X"])
     
     def find_father( x, p):
-        results = list(p.query("father({}, X)".format(x)))
-        return [result['X'] for result in results]
+        results = list(p.query("father(X, {})".format(x)))
+        print("Father of", x + ":")
+        for result in results:
+            print(result["X"])
     
     def find_daughters( x, p):
-        results = list(p.query("daughter({}, X)".format(x)))
-        return [result['X'] for result in results]
+        results = list(p.query("daughter(X, {})".format(x)))
+        print("Daughter/s of", x + ":")
+        for result in results:
+            print(result["X"])
 
     def find_sons( x, p):
-        results = list(p.query("son({}, X)".format(x)))
-        return [result['X'] for result in results]
+        results = list(p.query("son(X, {})".format(x)))
+        print("Son/s of", x + ":")
+        for result in results:
+            print(result["X"])
     
-    def find_children( x, p):
-        results = list(p.query("children({}, X, Y, Z)".format(x)))
-        return [(result['X'], result['Y'], result['Z']) for result in results]
+    def find_children(x, p):
+        results = list(p.query("children(X, Y, Z, {})".format(x)))
+        print("Children of", x + ":")
+        for result in results:
+            print(result["X"])
+            print(result["Y"])
+            print(result["Z"])
+
+
+            
 
     def execute_is_x_typeof_y(typeof,x,y,p):
         # is nameOne a/an/the ___ of nameTwo?
