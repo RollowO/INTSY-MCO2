@@ -144,7 +144,7 @@ def parse(user_input,prolog):
 def __main__():
     prolog = init_prolog()
     while True:
-        user_input = input("Prompt something about family relationships")
+        user_input = input("Prompt something about family relationships - ")
         if(user_input == "exit"):
             break
         else:

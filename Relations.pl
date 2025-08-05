@@ -15,6 +15,8 @@
 :- dynamic brother/2.
 :- dynamic mother/2.
 :- dynamic father/2.
+:- dynamic children_of/4.
+:- dynamic parents_of/3.
 
 % parents
 mother(X,Y) :- parent(X,Y), female(X), X \= Y.

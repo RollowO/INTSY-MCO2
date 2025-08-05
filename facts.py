@@ -97,14 +97,14 @@ class Facts():
 
     def parents(p,x,y,z):
         try:
-            p.assertz("parents({},{},{})".format(x,y,z))
+            p.assertz("parents_of({},{},{})".format(x,y,z))
             print("Parents fact asserted successfully.")
         except Exception as e:
             print(f"Error asserting parents fact: {e}")
 
     def children(p,x,y,z,a):
         try:
-            p.assertz("children({},{},{},{})".format(x,y,z,a))
+            p.assertz("children_of({},{},{},{})".format(x,y,z,a))
             print("Children fact asserted successfully.")
         except Exception as e:
             print(f"Error asserting children fact: {e}")

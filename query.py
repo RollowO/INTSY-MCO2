@@ -123,7 +123,7 @@ class Query():
 
     def query_parents( x, y, z, p):
         try:
-            results = bool(list(p.query("parents({},{},{})".format(x,y,z))))
+            results = bool(list(p.query("parents_of({},{},{})".format(x,y,z))))
             if results:
                 print("Yes")
             else:
@@ -133,7 +133,7 @@ class Query():
 
     def query_children( x, y, z, a, p):
         try:
-            results = bool(list(p.query("children({},{},{},{})".format(x,y,z,a))))
+            results = bool(list(p.query("children_of({},{},{},{})".format(x,y,z,a))))
             if results:
                 print("Yes")
             else:
