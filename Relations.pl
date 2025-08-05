@@ -36,3 +36,21 @@ sister(X,Y) :- siblings(X,Y), female(X), X\= Y.
 uncle(X,Y) :- brother(X,P), child(Y,P), X\=Y
 aunt(X,Y) :- sister(X,P), child(Y,P), X\=Y
 
+% relatives logic
+relatives(X, Y) :-
+    X \= Y,
+    (
+        parent(X, Y);
+        parent(Y, X);
+        siblings(X, Y);
+        child(X, Y);
+        child(Y, X);
+        grandfather(X, Y);
+        grandfather(Y, X);
+        grandmother(X, Y);
+        grandmother(Y, X);
+        uncle(X, Y);
+        uncle(Y, X);
+        aunt(X, Y);
+        aunt(Y, X)
+    ).
