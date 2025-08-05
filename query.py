@@ -5,9 +5,9 @@ class Query():
         try:
             results = bool(list(p.query("siblings({}, {})".format(x, y))))
             if results:
-                print("Yes")
+                print("Yes!")
             else:
-                print("No")
+                print("No.")
         except Exception as e:
             print(f"Error querying siblings: {e}")
 
@@ -15,9 +15,9 @@ class Query():
         try:
             results = bool(list(p.query("son({}, {})".format(x, y))))
             if results:
-                print("Yes")
+                print("Yes!")
             else:
-                print("No")
+                print("No.")
         except Exception as e:
             print(f"Error querying son: {e}")
 
@@ -25,9 +25,9 @@ class Query():
         try:
             results = bool(list(p.query("sister({}, {})".format(x, y))))
             if results:
-                print("Yes")
+                print("Yes!")
             else:
-                print("No")
+                print("No.")
         except Exception as e:
             print(f"Error querying sister: {e}")
 
@@ -35,9 +35,9 @@ class Query():
         try:
             results = bool(list(p.query("grandmother({}, {})".format(x, y))))
             if results:
-                print("Yes")
+                print("Yes!")
             else:
-                print("No")
+                print("No.")
         except Exception as e:
             print(f"Error querying grandmother: {e}")
 
@@ -45,9 +45,9 @@ class Query():
         try:
             results = bool(list(p.query("grandfather({}, {})".format(x, y))))
             if results:
-                print("Yes")
+                print("Yes!")
             else:
-                print("No")
+                print("No.")
         except Exception as e:
             print(f"Error querying grandfather: {e}")
 
@@ -55,9 +55,9 @@ class Query():
         try:
             results = bool(list(p.query("child({}, {})".format(x, y))))
             if results:
-                print("Yes")
+                print("Yes!")
             else:
-                print("No")
+                print("No.")
         except Exception as e:
             print(f"Error querying child: {e}")
 
@@ -65,9 +65,9 @@ class Query():
         try:
             results = bool(list(p.query("daughter({}, {})".format(x, y))))
             if results:
-                print("Yes")
+                print("Yes!")
             else:
-                print("No")
+                print("No.")
         except Exception as e:
             print(f"Error querying daughter: {e}")
 
@@ -75,9 +75,9 @@ class Query():
         try:
             results = bool(list(p.query("brother({}, {})".format(x, y))))
             if results:
-                print("Yes")
+                print("Yes!")
             else:
-                print("No")
+                print("No.")
         except Exception as e:
             print(f"Error querying brother: {e}")
 
@@ -85,9 +85,9 @@ class Query():
         try:
             results = bool(list(p.query("uncle({}, {})".format(x, y))))
             if results:
-                print("Yes")
+                print("Yes!")
             else:
-                print("No")
+                print("No.")
         except Exception as e:
             print(f"Error querying uncle: {e}")
 
@@ -95,9 +95,9 @@ class Query():
         try:
             results = bool(list(p.query("aunt({}, {})".format(x, y))))
             if results:
-                print("Yes")
+                print("Yes!")
             else:
-                print("No")
+                print("No.")
         except Exception as e:
             print(f"Error querying aunt: {e}")
 
@@ -105,9 +105,9 @@ class Query():
         try:
             results = bool(list(p.query("mother({}, {})".format(x, y))))
             if results:
-                print("Yes")
+                print("Yes!")
             else:
-                print("No")
+                print("No.")
         except Exception as e:
             print(f"Error querying mother: {e}")
 
@@ -115,9 +115,9 @@ class Query():
         try:
             results = bool(list(p.query("father({}, {})".format(x, y))))
             if results:
-                print("Yes")
+                print("Yes!")
             else:
-                print("No")
+                print("No.")
         except Exception as e:
             print(f"Error querying father: {e}")
 
@@ -125,9 +125,9 @@ class Query():
         try:
             results = bool(list(p.query("parents_of({},{},{})".format(x,y,z))))
             if results:
-                print("Yes")
+                print("Yes!")
             else:
-                print("No")
+                print("No.")
         except Exception as e:
             print(f"Error querying parents: {e}")
 
@@ -135,9 +135,9 @@ class Query():
         try:
             results = bool(list(p.query("children_of({},{},{},{})".format(x,y,z,a))))
             if results:
-                print("Yes")
+                print("Yes!")
             else:
-                print("No")
+                print("No.")
         except Exception as e:
             print(f"Error querying children: {e}")
 
@@ -145,9 +145,9 @@ class Query():
         try:
             results = bool(list(p.query("relatives({}, {})".format(x, y))))
             if results:
-                print("Yes")
+                print("Yes!")
             else:
-                print("No")
+                print("No.")
         except Exception as e:
             print(f"Error querying relatives: {e}")
 

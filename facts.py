@@ -1,6 +1,14 @@
 from pyswip import Prolog
 
 class Facts():
+    def check_contradiction(p,statement):
+        try:
+            contradiction = list(p.query("contradiction(X)"))
+            if contradiction:
+                p.retract(statement)
+        except Exception as e:
+            print(f"Error checking contradiction: {e}")
+
     def siblings(p,x,y):
         try:
             already_exists = bool(list(p.query("siblings({}, {})".format(x, y))))
@@ -8,8 +16,10 @@ class Facts():
                 print("Sibling fact already exists.")
             else:
                 p.assertz("siblings({},{})".format(x,y))
+                #Facts.check_contradiction(p,"siblings({},{})",format(x,y))
                 p.assertz("siblings({},{})".format(y,x))
-                print("Sibling fact asserted successfully.")
+                #Facts.check_contradiction(p,"siblings({},{})",format(y,x))
+                print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting sibling fact: {e}")
 
@@ -21,7 +31,7 @@ class Facts():
             else:
                 p.assertz("male({})".format(x))
                 p.assertz("parent({},{})".format(y,x))
-                print("Son fact asserted successfully.")
+                print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting son fact: {e}")
 
@@ -34,7 +44,7 @@ class Facts():
                 p.assertz("siblings({},{})".format(x,y))
                 p.assertz("female({})".format(x))
                 p.assertz("siblings({},{})".format(y,x))
-                print("Sister fact asserted successfully.")
+                print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting sister fact: {e}")
 
@@ -47,7 +57,7 @@ class Facts():
             else:
                 p.assertz("grandmother({},{})".format(x,y))
                 p.assertz("female({})".format(x))
-                print("Grandmother fact asserted successfully.")
+                print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting grandmother fact: {e}")
 
@@ -59,7 +69,7 @@ class Facts():
             else:
                 p.assertz("grandfather({},{})".format(x,y))
                 p.assertz("male({})".format(x))
-                print("Grandfather fact asserted successfully.")
+                print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting grandfather fact: {e}")
 
@@ -70,7 +80,7 @@ class Facts():
                 print("Child fact already exists.")
             else:
                 p.assertz("parent({},{})".format(y,x))
-                print("Child fact asserted successfully.")
+                print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting child fact: {e}")
 
@@ -82,7 +92,7 @@ class Facts():
             else:
                 p.assertz("female({})".format(x))
                 p.assertz("parent({},{})".format(y,x))
-                print("Daughter fact asserted successfully.")
+                print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting daughter fact: {e}")
 
@@ -95,7 +105,7 @@ class Facts():
                 p.assertz("male({})".format(x))
                 p.assertz("siblings({},{})".format(x,y))
                 p.assertz("siblings({},{})".format(y,x))
-                print("Brother fact asserted successfully.")
+                print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting brother fact: {e}")
 
@@ -107,7 +117,7 @@ class Facts():
             else:
                 p.assertz("uncle({},{})".format(x,y))
                 p.assertz("male({})".format(x))
-                print("Uncle fact asserted successfully.")
+                print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting uncle fact: {e}")
 
@@ -119,7 +129,7 @@ class Facts():
             else:
                 p.assertz("aunt({},{})".format(x,y))
                 p.assertz("female({})".format(x))
-                print("Aunt fact asserted successfully.")
+                print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting aunt fact: {e}")
 
@@ -131,7 +141,7 @@ class Facts():
             else:
                 p.assertz("female({})".format(x))
                 p.assertz("parent({},{})".format(x,y))
-                print("Mother fact asserted successfully.")
+                print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting mother fact: {e}")
 
@@ -143,7 +153,7 @@ class Facts():
             else:
                 p.assertz("male({})".format(x))
                 p.assertz("parent({},{})".format(x,y))
-                print("Father fact asserted successfully.")
+                print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting father fact: {e}")
 
@@ -156,7 +166,7 @@ class Facts():
                 p.assertz("parents_of({},{},{})".format(x,y,z))
                 p.assertz("parent({},{})".format(x,z))
                 p.assertz("parent({},{})".format(y,z))
-                print("Parents fact asserted successfully.")
+                print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting parents fact: {e}")
 
@@ -169,7 +179,7 @@ class Facts():
                 p.assertz("parent({},{})".format(a,x))
                 p.assertz("parent({},{})".format(a,y))
                 p.assertz("parent({},{})".format(a,z))
-                print("Children fact asserted successfully.")
+                print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting children fact: {e}")
 
