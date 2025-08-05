@@ -1,13 +1,24 @@
 from pyswip import Prolog
 
 class Facts():
+    def add_fact(p, statement):
+        try:
+            p.assertz(statement)
+            result = Facts.check_contradiction(p, statement)
+            return result
+        except Exception as e:
+            print(f"Error adding fact: {e}")
+
     def check_contradiction(p,statement):
         try:
             contradiction = list(p.query("contradiction(X)"))
             if contradiction:
                 p.retract(statement)
+                print(f"Contradiction found: {statement} retracted.")
+                return True
         except Exception as e:
             print(f"Error checking contradiction: {e}")
+            return False
 
     def siblings(p,x,y):
         try:
@@ -15,11 +26,13 @@ class Facts():
             if already_exists:
                 print("Sibling fact already exists.")
             else:
-                p.assertz("siblings({},{})".format(x,y))
-                #Facts.check_contradiction(p,"siblings({},{})",format(x,y))
-                p.assertz("siblings({},{})".format(y,x))
-                #Facts.check_contradiction(p,"siblings({},{})",format(y,x))
-                print("OK! I learned something.")
+                result1 = Facts.add_fact(p,"siblings({},{})".format(x,y))
+                result2 = Facts.add_fact(p,"siblings({},{})".format(y,x))
+                if result1 or result2: #if either of these facts are contradictory, remove them both
+                    p.retract("siblings({},{})".format(x,y))
+                    p.retract("siblings({},{})".format(y,x))
+                if not result1 and not result2:
+                    print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting sibling fact: {e}")
 
@@ -29,9 +42,13 @@ class Facts():
             if already_exists:
                 print("Son fact already exists.")
             else:
-                p.assertz("male({})".format(x))
-                p.assertz("parent({},{})".format(y,x))
-                print("OK! I learned something.")
+                result1 = Facts.add_fact(p,"male({})".format(x))
+                result2 = Facts.add_fact(p,"parent({},{})".format(y,x))
+                if result1 or result2:
+                    p.retract("parent({},{})".format(y,x))
+                    p.retract("male({})".format(x))
+                if not result1 and not result2:
+                    print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting son fact: {e}")
 
@@ -41,10 +58,15 @@ class Facts():
             if already_exists:
                 print("Sister fact already exists.")
             else:
-                p.assertz("siblings({},{})".format(x,y))
-                p.assertz("female({})".format(x))
-                p.assertz("siblings({},{})".format(y,x))
-                print("OK! I learned something.")
+                result1 = Facts.add_fact(p,"siblings({},{})".format(x,y))
+                result2 = Facts.add_fact(p,"female({})".format(x))
+                result3 = Facts.add_fact(p,"siblings({},{})".format(y,x))
+                if result1 or result2 or result3:
+                    p.retract("siblings({},{})".format(x,y))
+                    p.retract("female({})".format(x))
+                    p.retract("siblings({},{})".format(y,x))
+                if not result1 and not result2 and not result3:
+                    print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting sister fact: {e}")
 
@@ -55,9 +77,13 @@ class Facts():
             if already_exists:
                 print("Grandmother fact already exists.")
             else:
-                p.assertz("grandmother({},{})".format(x,y))
-                p.assertz("female({})".format(x))
-                print("OK! I learned something.")
+                result1 = Facts.add_fact(p,"grandmother({},{})".format(x,y))
+                result2 = Facts.add_fact(p,"female({})".format(x))
+                if result1 or result2:
+                    p.retract("grandmother({},{})".format(x,y))
+                    p.retract("female({})".format(x))
+                if not result1 and not result2:
+                    print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting grandmother fact: {e}")
 
@@ -67,9 +93,13 @@ class Facts():
             if already_exists:
                 print("Grandfather fact already exists.")
             else:
-                p.assertz("grandfather({},{})".format(x,y))
-                p.assertz("male({})".format(x))
-                print("OK! I learned something.")
+                result1 = Facts.add_fact(p,"grandfather({},{})".format(x,y))
+                result2 = Facts.add_fact(p,"male({})".format(x))
+                if result1 or result2:
+                    p.retract("grandfather({},{})".format(x,y))
+                    p.retract("male({})".format(x))
+                if not result1 and not result2:
+                    print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting grandfather fact: {e}")
 
@@ -79,8 +109,11 @@ class Facts():
             if already_exists:
                 print("Child fact already exists.")
             else:
-                p.assertz("parent({},{})".format(y,x))
-                print("OK! I learned something.")
+                result = Facts.add_fact(p,"parent({},{})".format(y,x))
+                if result:
+                    p.retract("parent({},{})".format(y,x))
+                if not result:
+                    print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting child fact: {e}")
 
@@ -90,9 +123,13 @@ class Facts():
             if already_exists:
                 print("Daughter fact already exists.")
             else:
-                p.assertz("female({})".format(x))
-                p.assertz("parent({},{})".format(y,x))
-                print("OK! I learned something.")
+                result1 = Facts.add_fact(p,"female({})".format(x))
+                result2 = Facts.add_fact(p,"parent({},{})".format(y,x))
+                if result1 or result2:
+                    p.retract("female({})".format(x))
+                    p.retract("parent({},{})".format(y,x))
+                if not result1 and not result2:
+                    print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting daughter fact: {e}")
 
@@ -102,10 +139,15 @@ class Facts():
             if already_exists:
                 print("Brother fact already exists.")
             else:
-                p.assertz("male({})".format(x))
-                p.assertz("siblings({},{})".format(x,y))
-                p.assertz("siblings({},{})".format(y,x))
-                print("OK! I learned something.")
+                result1 = Facts.add_fact(p,"male({})".format(x))
+                result2 = Facts.add_fact(p,"siblings({},{})".format(x,y))
+                result3 = Facts.add_fact(p,"siblings({},{})".format(y,x))
+                if result1 or result2 or result3:
+                    p.retract("male({})".format(x))
+                    p.retract("siblings({},{})".format(x,y))
+                    p.retract("siblings({},{})".format(y,x))
+                if not result1 and not result2 and not result3:
+                    print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting brother fact: {e}")
 
@@ -115,9 +157,13 @@ class Facts():
             if already_exists:
                 print("Uncle fact already exists.")
             else:
-                p.assertz("uncle({},{})".format(x,y))
-                p.assertz("male({})".format(x))
-                print("OK! I learned something.")
+                result1 = Facts.add_fact(p,"uncle({},{})".format(x,y))
+                result2 = Facts.add_fact(p,"male({})".format(x))
+                if result1 or result2:
+                    p.retract("uncle({},{})".format(x,y))
+                    p.retract("male({})".format(x))
+                if not result1 and not result2:
+                    print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting uncle fact: {e}")
 
@@ -127,9 +173,13 @@ class Facts():
             if already_exists:
                 print("Aunt fact already exists.")
             else:
-                p.assertz("aunt({},{})".format(x,y))
-                p.assertz("female({})".format(x))
-                print("OK! I learned something.")
+                result1 = Facts.add_fact(p,"aunt({},{})".format(x,y))
+                result2 = Facts.add_fact(p,"female({})".format(x))
+                if result1 or result2:
+                    p.retract("aunt({},{})".format(x,y))
+                    p.retract("female({})".format(x))
+                if not result1 and not result2:
+                    print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting aunt fact: {e}")
 
@@ -139,9 +189,13 @@ class Facts():
             if already_exists:
                 print("Mother fact already exists.")
             else:
-                p.assertz("female({})".format(x))
-                p.assertz("parent({},{})".format(x,y))
-                print("OK! I learned something.")
+                result1 = Facts.add_fact(p,"female({})".format(x))
+                result2 = Facts.add_fact(p,"parent({},{})".format(x,y))
+                if result1 or result2:
+                    p.retract("female({})".format(x))
+                    p.retract("parent({},{})".format(x,y))
+                if not result1 and not result2:
+                    print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting mother fact: {e}")
 
@@ -151,9 +205,13 @@ class Facts():
             if already_exists:
                 print("Father fact already exists.")
             else:
-                p.assertz("male({})".format(x))
-                p.assertz("parent({},{})".format(x,y))
-                print("OK! I learned something.")
+                result1 = Facts.add_fact(p,"male({})".format(x))
+                result2 = Facts.add_fact(p,"parent({},{})".format(x,y))
+                if result1 or result2:
+                    p.retract("parent({},{})".format(x,y))
+                    p.retract("male({})".format(x))
+                if not result1 and not result2:
+                    print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting father fact: {e}")
 
@@ -163,10 +221,15 @@ class Facts():
             if already_exists:
                 print("Parents fact already exists.")
             else:
-                p.assertz("parents_of({},{},{})".format(x,y,z))
-                p.assertz("parent({},{})".format(x,z))
-                p.assertz("parent({},{})".format(y,z))
-                print("OK! I learned something.")
+                result1 = Facts.add_fact(p,"parents_of({},{},{})".format(x,y,z))
+                result2 = Facts.add_fact(p,"parent({},{})".format(x,z))
+                result3 = Facts.add_fact(p,"parent({},{})".format(y,z))
+                if result1 or result2 or result3:
+                    p.retract("parents_of({},{},{})".format(x,y,z))
+                    p.retract("parent({},{})".format(x,z))
+                    p.retract("parent({},{})".format(y,z))
+                if not result1 and not result2 and not result3:
+                    print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting parents fact: {e}")
 
@@ -176,10 +239,15 @@ class Facts():
             if already_exists:
                 print("Children fact already exists.")
             else:
-                p.assertz("parent({},{})".format(a,x))
-                p.assertz("parent({},{})".format(a,y))
-                p.assertz("parent({},{})".format(a,z))
-                print("OK! I learned something.")
+                result1 = Facts.add_fact(p,"parent({},{})".format(a,x))
+                result2 = Facts.add_fact(p,"parent({},{})".format(a,y))
+                result3 = Facts.add_fact(p,"parent({},{})".format(a,z))
+                if result1 or result2 or result3:
+                    p.retract("parent({},{})".format(a,x))
+                    p.retract("parent({},{})".format(a,y))
+                    p.retract("parent({},{})".format(a,z))
+                if not result1 and not result2 and not result3:
+                    print("OK! I learned something.")
         except Exception as e:
             print(f"Error asserting children fact: {e}")
 

@@ -6,7 +6,6 @@
 :- dynamic siblings/2.
 :- dynamic uncle/2.
 :- dynamic aunt/2.
-:- dynamic cousin/2.
 :- dynamic relative/2.
 :- dynamic son/2.
 :- dynamic grandmother/2.
@@ -50,19 +49,72 @@ aunt(X,Y) :- sister(X,P), child(Y,P), X \= Y.
 
 % relatives logic
 relatives(X, Y) :-
-     X \= Y,
-     (
-         parent(X, Y);
-         parent(Y, X);
-         siblings(X, Y);
-         child(X, Y);
-         child(Y, X);
-         grandfather(X, Y);
-         grandfather(Y, X);
-         grandmother(X, Y);
-         grandmother(Y, X);
-         uncle(X, Y);
-         uncle(Y, X);
-         aunt(X, Y);
-         aunt(Y, X)
-     ).
+    X \= Y,
+    (
+        parent(X, Y);
+        parent(Y, X);
+        siblings(X, Y);
+        child(X, Y);
+        child(Y, X);
+        grandfather(X, Y);
+        grandfather(Y, X);
+        grandmother(X, Y);
+        grandmother(Y, X);
+        uncle(X, Y);
+        uncle(Y, X);
+        aunt(X, Y);
+        aunt(Y, X)
+    ).
+
+
+% contradictions
+% Same person contradictions
+contradiction(X) :- parent(X, X).
+contradiction(X) :- child(X, X).
+contradiction(X) :- siblings(X, X).
+contradiction(X) :- brother(X, X).
+contradiction(X) :- sister(X, X).
+contradiction(X) :- son(X, X).
+contradiction(X) :- daughter(X, X).
+contradiction(X) :- grandfather(X, X).
+contradiction(X) :- grandmother(X, X).
+contradiction(X) :- uncle(X, X).
+contradiction(X) :- aunt(X, X).
+contradiction(X) :- relatives(X, X).
+
+% More than one parent contradictions
+contradiction(Y) :- father(X, Y), father(Z, Y), X \= Z.
+contradiction(Y) :- mother(X, Y), mother(Z, Y), X \= Z.
+
+% Relationship contradictions
+contradiction(Y) :- parent(X, Y), child(X, Y), X \= Y.
+contradiction(X) :- child(X, Y), child(Y, X), X \= Y.
+contradiction(X) :- grandmother(X, Y), child(Y, X), X \= Y.
+contradiction(X) :- grandfather(X, Y), child(Y, X), X \= Y.
+contradiction(Y) :- child(X, Y), (grandfather(X, Y); grandmother(X, Y)), X \= Y.
+contradiction(Y) :- parent(X, Y), siblings(X, Y), X \= Y.
+contradiction(Y) :- uncle(X, Y), siblings(X, Y), X \= Y.
+contradiction(Y) :- aunt(X, Y), siblings(X, Y), X \= Y.
+contradiction(Y) :- siblings(X, Y), child(Y, X), X \= Y.
+contradiction(Y) :- child(X, Y), siblings(X, Y), X \= Y.
+contradiction(Y) :- siblings(X, Y), (grandfather(X, Y); grandmother(X, Y)), X \= Y.
+contradiction(Y) :- uncle(X, Y), parent(X, Y), X \= Y.
+contradiction(Y) :- aunt(X, Y), parent(X, Y), X \= Y.
+contradiction(Y) :- uncle(X, Y), aunt(X, Y), X \= Y.
+contradiction(Y) :- (grandfather(X, Y); grandmother(X, Y)), uncle(X, Y), X \= Y.
+contradiction(Y) :- (grandfather(X, Y); grandmother(X, Y)), aunt(X, Y), X \= Y.
+contradiction(X) :- grandfather(X, Y), grandfather(Y, X), X \= Y.
+contradiction(X) :- grandmother(X, Y), grandmother(Y, X), X \= Y.
+contradiction(X) :- uncle(X, Y), uncle(Y, X), X \= Y.
+contradiction(X) :- aunt(X, Y), aunt(Y, X), X \= Y.
+contradiction(X) :- grandmother(X, Y), grandfather(Y, X), X \= Y.
+
+% Gender contradictions
+contradiction(X) :- male(X), female(X).
+contradiction(X) :- father(X, Y), female(X), X \= Y.
+contradiction(X) :- mother(X, Y), male(X), X \= Y.
+contradiction(X) :- sister(X, Y), male(X), X \= Y.
+contradiction(X) :- brother(X, Y), female(X), X \= Y.
+contradiction(X) :- son(X, Y), female(X), X \= Y.
+contradiction(X) :- daughter(X, Y), male(X), X \= Y.
+

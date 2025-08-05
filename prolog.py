@@ -47,7 +47,6 @@ def parse(user_input,prolog):
     for index,pattern in enumerate(fact_patterns):
         match = re.fullmatch(pattern,user_input)
         if(match):
-            print("match!")
             if(index == 0):
                 family_type = get_family_type(match)
                 Facts.execute_typeof_family(family_type,match.group(1),match.group(3),prolog)
@@ -79,7 +78,6 @@ def parse(user_input,prolog):
     for index,pattern in enumerate(query_patterns):
         match = re.fullmatch(pattern,user_input)
         if(match):
-            print(match.groups())
             if(index == 0):
                 # Are __ and __ siblings
                 name_one = match.group(1)
