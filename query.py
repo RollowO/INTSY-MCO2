@@ -141,6 +141,16 @@ class Query():
         except Exception as e:
             print(f"Error querying children: {e}")
 
+    def query_relatives( x, y, p):
+        try:
+            results = bool(list(p.query("relatives({}, {})".format(x, y))))
+            if results:
+                return "Yes"
+            else:
+                return "No"
+        except Exception as e:
+            print(f"Error querying relatives: {e}")
+
     # LIST QUERIES, WHO ARE X OF Y?
     def find_siblings( x, p):
         results = list(p.query("siblings({}, X)".format(x)))
@@ -180,9 +190,46 @@ class Query():
 
     def execute_is_x_typeof_y(typeof,x,y,p):
         # is nameOne a/an/the ___ of nameTwo?
-        todo()
-    def execute_relations_of_x():
-        todo()
-    
+        if typeof =="sister":
+            return Query.query_sister(x, y, p)
+        elif typeof == "brother":
+            return Query.query_brother(x, y, p)
+        elif typeof == "son":
+            return Query.query_son(x, y, p)
+        elif typeof == "daughter":
+            return Query.query_daughter(x, y, p)
+        elif typeof == "grandmother":
+            return Query.query_grandmother(x, y, p)
+        elif typeof == "grandfather":
+            return Query.query_grandfather(x, y, p)
+        elif typeof == "uncle":
+            return Query.query_uncle(x, y, p)
+        elif typeof == "aunt":
+            return Query.query_aunt(x, y, p)
+        elif typeof == "mother":
+            return Query.query_mother(x, y, p)
+        elif typeof == "father":
+            return Query.query_father(x, y, p)
+        elif typeof == "child":
+            return Query.query_child(x, y, p)
 
-
+    def execute_relations_of_x(typeof,x,p):
+        #Who are the ___ of ____?
+        if typeof == "siblings":
+            return Query.find_siblings(x, p)
+        elif typeof == "sisters":
+            return Query.find_sisters(x, p)
+        elif typeof == "brothers":
+            return Query.find_brothers(x, p)
+        elif typeof == "parents":
+            return Query.find_parents(x, p)
+        elif typeof == "mother":
+            return Query.find_mother(x, p)
+        elif typeof == "father":
+            return Query.find_father(x, p)
+        elif typeof == "daughters":
+            return Query.find_daughters(x, p)
+        elif typeof == "sons":
+            return Query.find_sons(x, p)
+        elif typeof == "children":
+            return Query.find_children(x, p)
