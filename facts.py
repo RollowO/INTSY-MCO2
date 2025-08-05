@@ -1,253 +1,203 @@
 from pyswip import Prolog
 
+new_knowledge = "OK! I learned something"
+error_knowledge = "Oops! Something went wrong."
 class Facts():
-    def add_fact(p, statement):
+    def add_fact(p, fact):
         try:
-            p.assertz(statement)
-            result = Facts.check_contradiction(p, statement)
-            return result
-        except Exception as e:
-            print(f"Error adding fact: {e}")
+            p.assertz(fact)
 
-    def check_contradiction(p,statement):
-        try:
-            contradiction = list(p.query("contradiction(X)"))
-            if contradiction:
-                p.retract(statement)
-                print(f"Contradiction found: {statement} retracted.")
-                return True
+            # Check for contradictions
+            contradictions = list(p.query("contradiction(Reason)"))
+            #print("Contradictions found:", contradictions)  # Debug
+            if contradictions:
+                # If a contradiction is found, remove fact
+                p.retract(fact)
+                return False
+            return True,
         except Exception as e:
-            print(f"Error checking contradiction: {e}")
-            return False
+            return f"Error: {str(e)}"
+
+
 
     def siblings(p,x,y):
         try:
-            already_exists = bool(list(p.query("siblings({}, {})".format(x, y))))
-            if already_exists:
-                print("Sibling fact already exists.")
+            already_exists = bool(list(p.query("siblings('{}', '{}')".format(x, y))))
+
+            result1 = Facts.add_fact(p,"siblings('{}','{}')".format(x,y))
+            result2 = Facts.add_fact(p,"siblings('{}','{}')".format(y,x))
+            if result1 and result2:
+                print(new_knowledge)
             else:
-                result1 = Facts.add_fact(p,"siblings({},{})".format(x,y))
-                result2 = Facts.add_fact(p,"siblings({},{})".format(y,x))
-                if result1 or result2: #if either of these facts are contradictory, remove them both
-                    p.retract("siblings({},{})".format(x,y))
-                    p.retract("siblings({},{})".format(y,x))
-                if not result1 and not result2:
-                    print("OK! I learned something.")
+                print(error_knowledge)
         except Exception as e:
             print(f"Error asserting sibling fact: {e}")
 
     def son(p,x,y):
         try:
-            already_exists = bool(list(p.query("son({}, {})".format(x, y))))
-            if already_exists:
-                print("Son fact already exists.")
+            result1 = Facts.add_fact(p,"male('{}')".format(x))
+            result2 = Facts.add_fact(p,"parent('{}','{}')".format(y,x))
+            result3 = Facts.add_fact(p,"child('{}','{}')".format(x,y))
+
+            if result1 and result2 and result3:
+                print(new_knowledge)
             else:
-                result1 = Facts.add_fact(p,"male({})".format(x))
-                result2 = Facts.add_fact(p,"parent({},{})".format(y,x))
-                if result1 or result2:
-                    p.retract("parent({},{})".format(y,x))
-                    p.retract("male({})".format(x))
-                if not result1 and not result2:
-                    print("OK! I learned something.")
+                print(error_knowledge)
+
+                  
         except Exception as e:
             print(f"Error asserting son fact: {e}")
 
     def sister(p, x, y):
         try:
-            already_exists = bool(list(p.query("sister({}, {})".format(x, y))))
-            if already_exists:
-                print("Sister fact already exists.")
+
+            result1 = Facts.add_fact(p,"siblings('{}','{}')".format(x,y))
+            result3 = Facts.add_fact(p,"siblings('{}','{}')".format(y,x))
+            result2 = Facts.add_fact(p,"female('{}')".format(x))
+            if result1 and result2 and result3:
+                print(new_knowledge)
             else:
-                result1 = Facts.add_fact(p,"siblings({},{})".format(x,y))
-                result2 = Facts.add_fact(p,"female({})".format(x))
-                result3 = Facts.add_fact(p,"siblings({},{})".format(y,x))
-                if result1 or result2 or result3:
-                    p.retract("siblings({},{})".format(x,y))
-                    p.retract("female({})".format(x))
-                    p.retract("siblings({},{})".format(y,x))
-                if not result1 and not result2 and not result3:
-                    print("OK! I learned something.")
+                print(error_knowledge)
         except Exception as e:
             print(f"Error asserting sister fact: {e}")
 
 
     def grandmother(p,x,y):
         try:
-            already_exists = bool(list(p.query("grandmother({}, {})".format(x, y))))
-            if already_exists:
-                print("Grandmother fact already exists.")
+            result1 = Facts.add_fact(p,"grandmother('{}','{}')".format(x,y))
+            result2 = Facts.add_fact(p,"grandchild('{}','{}')".format(y,x))
+            result3 = Facts.add_fact(p,"female('{}')".format(x))
+            if result1 and result2 and result3:
+                print(new_knowledge)
             else:
-                result1 = Facts.add_fact(p,"grandmother({},{})".format(x,y))
-                result2 = Facts.add_fact(p,"female({})".format(x))
-                if result1 or result2:
-                    p.retract("grandmother({},{})".format(x,y))
-                    p.retract("female({})".format(x))
-                if not result1 and not result2:
-                    print("OK! I learned something.")
+                print(error_knowledge)
         except Exception as e:
             print(f"Error asserting grandmother fact: {e}")
 
     def grandfather(p,x,y):
         try:
-            already_exists = bool(list(p.query("grandfather({}, {})".format(x, y))))
-            if already_exists:
-                print("Grandfather fact already exists.")
+            result1 = Facts.add_fact(p,"grandfather('{}','{}')".format(x,y))
+            result3 = Facts.add_fact(p,"grandchild('{}','{}')".format(y,x))
+            result2 = Facts.add_fact(p,"male('{}')".format(x))
+            if(result1 and result2 and result3):
+                print(new_knowledge)
             else:
-                result1 = Facts.add_fact(p,"grandfather({},{})".format(x,y))
-                result2 = Facts.add_fact(p,"male({})".format(x))
-                if result1 or result2:
-                    p.retract("grandfather({},{})".format(x,y))
-                    p.retract("male({})".format(x))
-                if not result1 and not result2:
-                    print("OK! I learned something.")
+                print(error_knowledge)
         except Exception as e:
             print(f"Error asserting grandfather fact: {e}")
 
     def child(p,x,y):
         try:
-            already_exists = bool(list(p.query("parent({}, {})".format(y, x))))
-            if already_exists:
-                print("Child fact already exists.")
+            result2 = Facts.add_fact(p,"child('{}','{}')".format(x,y))
+            result = Facts.add_fact(p,"parent('{}','{}')".format(y,x))
+            if(result and result2):
+                print(new_knowledge)
             else:
-                result = Facts.add_fact(p,"parent({},{})".format(y,x))
-                if result:
-                    p.retract("parent({},{})".format(y,x))
-                if not result:
-                    print("OK! I learned something.")
+                print(error_knowledge)
         except Exception as e:
             print(f"Error asserting child fact: {e}")
 
     def daughter(p,x,y):
         try:
-            already_exists = bool(list(p.query("daughter({}, {})".format(x, y))))
-            if already_exists:
-                print("Daughter fact already exists.")
+
+            result1 = Facts.add_fact(p,"child('{}','{}')".format(x,y))
+            result2 = Facts.add_fact(p,"parent('{}','{}')".format(y,x))
+            result3 = Facts.add_fact(p,"female('{}')".format(x))
+            if result1 and result3 and result2:
+                print(new_knowledge)
             else:
-                result1 = Facts.add_fact(p,"female({})".format(x))
-                result2 = Facts.add_fact(p,"parent({},{})".format(y,x))
-                if result1 or result2:
-                    p.retract("female({})".format(x))
-                    p.retract("parent({},{})".format(y,x))
-                if not result1 and not result2:
-                    print("OK! I learned something.")
+                print(error_knowledge)
+                 
         except Exception as e:
             print(f"Error asserting daughter fact: {e}")
 
     def brother(p,x,y):
         try:
-            already_exists = bool(list(p.query("brother({}, {})".format(x, y))))
-            if already_exists:
-                print("Brother fact already exists.")
+            result1 = Facts.add_fact(p,"siblings('{}','{}')".format(x,y))
+            result2 = Facts.add_fact(p,"siblings('{}','{}')".format(y,x))
+            result3 = Facts.add_fact(p,"male('{}')".format(x))
+            if result1 and result2 and result3:
+                print(new_knowledge)
             else:
-                result1 = Facts.add_fact(p,"male({})".format(x))
-                result2 = Facts.add_fact(p,"siblings({},{})".format(x,y))
-                result3 = Facts.add_fact(p,"siblings({},{})".format(y,x))
-                if result1 or result2 or result3:
-                    p.retract("male({})".format(x))
-                    p.retract("siblings({},{})".format(x,y))
-                    p.retract("siblings({},{})".format(y,x))
-                if not result1 and not result2 and not result3:
-                    print("OK! I learned something.")
+                print(error_knowledge)
         except Exception as e:
             print(f"Error asserting brother fact: {e}")
 
     def uncle(p,x,y):
         try:
-            already_exists = bool(list(p.query("uncle({}, {})".format(x, y))))
-            if already_exists:
-                print("Uncle fact already exists.")
+            result1 = Facts.add_fact(p,"uncle('{}','{}')".format(x,y))
+            result2 = Facts.add_fact(p,"male('{}')".format(x))
+            if result1 and result2:
+                print(new_knowledge)
             else:
-                result1 = Facts.add_fact(p,"uncle({},{})".format(x,y))
-                result2 = Facts.add_fact(p,"male({})".format(x))
-                if result1 or result2:
-                    p.retract("uncle({},{})".format(x,y))
-                    p.retract("male({})".format(x))
-                if not result1 and not result2:
-                    print("OK! I learned something.")
+                print(error_knowledge)
         except Exception as e:
             print(f"Error asserting uncle fact: {e}")
 
     def aunt(p,x,y):
         try:
-            already_exists = bool(list(p.query("aunt({}, {})".format(x, y))))
-            if already_exists:
-                print("Aunt fact already exists.")
+            result1 = Facts.add_fact(p,"aunt('{}','{}')".format(x,y))
+            result2 = Facts.add_fact(p,"female('{}')".format(x))
+            if result1 and result2:
+                print(new_knowledge)
             else:
-                result1 = Facts.add_fact(p,"aunt({},{})".format(x,y))
-                result2 = Facts.add_fact(p,"female({})".format(x))
-                if result1 or result2:
-                    p.retract("aunt({},{})".format(x,y))
-                    p.retract("female({})".format(x))
-                if not result1 and not result2:
-                    print("OK! I learned something.")
+                print(error_knowledge)
         except Exception as e:
             print(f"Error asserting aunt fact: {e}")
 
     def mother(p,x,y):
         try:
-            already_exists = bool(list(p.query("mother({}, {})".format(x, y))))
-            if already_exists:
-                print("Mother fact already exists.")
+            result1 = Facts.add_fact(p,"female('{}')".format(x))
+            result2 = Facts.add_fact(p,"parent('{}','{}')".format(x,y))
+            result3 = Facts.add_fact(p,"child('{}','{}')".format(y,x))
+            if result1 and result2 and result3:
+                print(new_knowledge)
             else:
-                result1 = Facts.add_fact(p,"female({})".format(x))
-                result2 = Facts.add_fact(p,"parent({},{})".format(x,y))
-                if result1 or result2:
-                    p.retract("female({})".format(x))
-                    p.retract("parent({},{})".format(x,y))
-                if not result1 and not result2:
-                    print("OK! I learned something.")
+                print(error_knowledge)
+
+              
         except Exception as e:
             print(f"Error asserting mother fact: {e}")
 
     def father(p,x,y):
         try:
-            already_exists = bool(list(p.query("father({}, {})".format(x, y))))
-            if already_exists:
-                print("Father fact already exists.")
+            result2 = Facts.add_fact(p,"parent('{}','{}')".format(x,y))
+            result3 = Facts.add_fact(p,"child('{}','{}')".format(y,x))
+            result1 = Facts.add_fact(p,"male('{}')".format(x))
+            if result1 and result2 and result3:
+                print(new_knowledge)
             else:
-                result1 = Facts.add_fact(p,"male({})".format(x))
-                result2 = Facts.add_fact(p,"parent({},{})".format(x,y))
-                if result1 or result2:
-                    p.retract("parent({},{})".format(x,y))
-                    p.retract("male({})".format(x))
-                if not result1 and not result2:
-                    print("OK! I learned something.")
+                print(error_knowledge)
+                
         except Exception as e:
             print(f"Error asserting father fact: {e}")
 
     def parents(p,x,y,z):
         try:
-            already_exists = bool(list(p.query("parents_of({},{},{})".format(x,y,z))))
-            if already_exists:
-                print("Parents fact already exists.")
+            result4 = add_fact(p,"child('{}','{}')".format(z,x))
+            result1 = add_fact(p,"child('{}','{}')".format(z,y))
+            result2 = Facts.add_fact(p,"parent('{}','{}')".format(x,z))
+            result3 = Facts.add_fact(p,"parent('{}','{}')".format(y,z))
+            if(result1 and result2 and result3 and result4):
+                print(new_knowledge)
             else:
-                result1 = Facts.add_fact(p,"parents_of({},{},{})".format(x,y,z))
-                result2 = Facts.add_fact(p,"parent({},{})".format(x,z))
-                result3 = Facts.add_fact(p,"parent({},{})".format(y,z))
-                if result1 or result2 or result3:
-                    p.retract("parents_of({},{},{})".format(x,y,z))
-                    p.retract("parent({},{})".format(x,z))
-                    p.retract("parent({},{})".format(y,z))
-                if not result1 and not result2 and not result3:
-                    print("OK! I learned something.")
+                print(error_knowledge)
         except Exception as e:
             print(f"Error asserting parents fact: {e}")
 
     def children(p,x,y,z,a):
         try:
-            already_exists = bool(list(p.query("parent({}, {})".format(a,x))))
-            if already_exists:
-                print("Children fact already exists.")
+            result1 = Facts.add_fact(p,"parent('{}','{}')".format(a,x))
+            result2 = Facts.add_fact(p,"parent('{}','{}')".format(a,y))
+            result3 = Facts.add_fact(p,"parent('{}','{}')".format(a,z))
+
+            result4 = Facts.add_fact(p,"child('{}','{}')".format(x,a))
+            result5 = Facts.add_fact(p,"child('{}','{}')".format(y,a))
+            result6 = Facts.add_fact(p,"child('{}','{}')".format(z,a))
+            if result1 and result2 and result3 and result4 and result5 and result6:
+                print(new_knowledge)
             else:
-                result1 = Facts.add_fact(p,"parent({},{})".format(a,x))
-                result2 = Facts.add_fact(p,"parent({},{})".format(a,y))
-                result3 = Facts.add_fact(p,"parent({},{})".format(a,z))
-                if result1 or result2 or result3:
-                    p.retract("parent({},{})".format(a,x))
-                    p.retract("parent({},{})".format(a,y))
-                    p.retract("parent({},{})".format(a,z))
-                if not result1 and not result2 and not result3:
-                    print("OK! I learned something.")
+                print(error_knowledge)
         except Exception as e:
             print(f"Error asserting children fact: {e}")
 

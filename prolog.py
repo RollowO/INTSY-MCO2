@@ -23,12 +23,12 @@ def parse(user_input,prolog):
     family_types_four=r"(sisters|brothers|parents|daughters|sons|siblings|children)"
     word_pattern = r"(\b\w+\b)"
     fact_patterns = [
-        word_pattern+r" is a "+family_types_one+r" of "+word_pattern,
-        word_pattern+r" is the "+family_types_two+r" of "+word_pattern,
-        word_pattern+r" is an "+family_types_three+r" of "+word_pattern,
-        word_pattern+r" and "+word_pattern+r" are siblings",
-        word_pattern+r", "+word_pattern+r" and "+word_pattern+r" are children of "+word_pattern,
-        word_pattern+r" and "+word_pattern+r" are the parents of "+word_pattern
+        word_pattern+r" is a "+family_types_one+r" of "+word_pattern+r'\.',
+        word_pattern+r" is the "+family_types_two+r" of "+word_pattern+r'\.',
+        word_pattern+r" is an "+family_types_three+r" of "+word_pattern+r'\.',
+        word_pattern+r" and "+word_pattern+r" are siblings"+r'\.',
+        word_pattern+r", "+word_pattern+r" and "+word_pattern+r" are children of "+word_pattern+r'\.',
+        word_pattern+r" and "+word_pattern+r" are the parents of "+word_pattern+r'\.'
     ]
 
     query_patterns=[
