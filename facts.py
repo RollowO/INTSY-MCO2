@@ -91,3 +91,8 @@ class Facts():
             p.assertz("children({},{},{},{})".format(x,y,z,a))
         except Exception as e:
             print(f"Error asserting children fact: {e}")
+
+    def execute_typeof_family(family):
+        if family == "sister":
+        
+        elif family == "brother":
