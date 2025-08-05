@@ -1,7 +1,6 @@
 from pyswip import Prolog
 
 class Facts():
-    
     def siblings(p,x,y):
         try:
             p.assertz("sibling({},{})".format(x,y))
@@ -95,5 +94,28 @@ class Facts():
     # function only applies to the two arguement statements
     def execute_typeof_family(family,x,y,p):
         if family == "sister":
-        
+            Facts.siblings(p,x,y)
+        elif family == "son":
+            Facts.son(p,x,y)
+        elif family == "sister":
+            Facts.sister(p,x,y)
+        elif family == "grandmother":
+            Facts.grandmother(p,x,y)
+        elif family == "grandfather":
+            Facts.grandfather(p,x,y)
+        elif family == "child":
+            Facts.child(p,x,y)
+        elif family == "daughter":
+            Facts.daughter(p,x,y)
+        elif family == "grandfather":
+            Facts.grandfather(p,x,y)
         elif family == "brother":
+            Facts.brother(p,x,y)
+        elif family == "uncle":
+            Facts.uncle(p,x,y)
+        elif family == "aunt":
+            Facts.aunt(p,x,y)
+        elif family == "mother":
+            Facts.mother(p,x,y)
+        elif family == "father":
+            Facts.father(p,x,y)
