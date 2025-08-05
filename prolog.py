@@ -80,10 +80,12 @@ def parse(user_input,prolog):
             print("MATCHED QUERY")
             print(match.groups())
             if(index == 0):
+                # Are __ and __ siblings
                 name_one = match.group(0)
                 name_two = match.group(1)
                 Query.query_siblings(p=prolog,x=name_one,y=name_two)
             elif(index == 1):
+                # 1- 3 == Is _ a/an/the __ of __
                 family_type = get_family_type(match)
                 name_one = match.group(0)
                 name_two = match.group(2)
@@ -102,14 +104,38 @@ def parse(user_input,prolog):
                 Query.execute_is_x_typeof_y(family_type,x=name_one,y=name_two,p=prolog)
                 todo()
             elif(index == 4):
+                # Are _ and _ the parents of _
+                name_one = match.group(0)
+                name_two = match.group(1)
+                name_three = match.group(2)                    
+                Query.query_parents(x=name_one,y=name_two,z=name_three,p=prolog)
                 todo()
             elif(index == 5):
+                # Are _ _ _ children of _
+                name_one = match.group(0)
+                name_two = match.group(1)
+                name_three = match.group(2)
+                name_four = match.group(3)
+                Query.query_children(x=name_one,y=name_two,z=name_three,a=name_four,p=prolog)
                 todo()
             elif(index == 6):
+                # Who are the __ of __
+                family_type = match.group(0)
+                name_one = match.group(1)
+                Query.execute_relations_of_x(typeof=family_type,x=name_one,p=prolog)
+                
                 todo()
             elif(index == 7):
-                todo()
+                # Who is the __ of __
+                family_type = match.group(0)
+                Query.execute_relations_of_x(typeof=family_type,x=name_one,p=prolog)
+
+
             elif(index == 8):
+                # Are _ and _ relatives?
+                name_one = match.group(0)
+                name_two = match.group(1)
+                Query.query_relatives(p=prolog,x=name_one,y=name_two)
                 todo()
 
 

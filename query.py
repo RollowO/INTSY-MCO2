@@ -181,5 +181,8 @@ class Query():
     def execute_is_x_typeof_y(typeof,x,y,p):
         # is nameOne a/an/the ___ of nameTwo?
         todo()
-
+    def execute_relations_of_x():
+        todo()
     
+
+
