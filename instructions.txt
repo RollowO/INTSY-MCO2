@@ -1,0 +1,1 @@
+To run the program type python3 prolog.py in the terminal
